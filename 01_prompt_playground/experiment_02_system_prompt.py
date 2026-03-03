@@ -14,7 +14,7 @@ Key insight documented:
   This is how enterprise AI systems enforce tone, domain boundaries, and safety.
 
 Usage:
-    python 01_prompt_playground/LLM_behaviour.py
+    python 01_prompt_playground/experiment_02_system_prompt.py
 
 Outputs:
     - Formatted console report comparing all three personas
