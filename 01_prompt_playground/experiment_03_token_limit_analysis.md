@@ -1,4 +1,4 @@
-# Experiment 05 — Token Limit: A Scientific Analysis
+# Experiment 03 — Token Limit: A Scientific Analysis
 
 > **Core question:** How does `max_tokens` affect output completeness, quality, cost, and suitability for downstream systems like RAG and chat memory?
 

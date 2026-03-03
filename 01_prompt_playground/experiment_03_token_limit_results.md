@@ -1,4 +1,4 @@
-# Experiment 05 — Token Limit Analysis Results
+# Experiment 03 — Token Limit Analysis Results
 
 > **Model**: `gpt-4o-mini` | **Temperature**: `0.3` | **Budgets**: [50, 150, 300, 600]
 

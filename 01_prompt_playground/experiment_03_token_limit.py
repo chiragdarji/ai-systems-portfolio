@@ -1,5 +1,5 @@
 """
-Experiment 05 — Token Limit Analysis
+Experiment 03 — Token Limit Analysis
 ======================================
 Systematically tests how max_tokens affects output quality, truncation
 behaviour, finish_reason, and cost across four real-world use cases.
@@ -17,7 +17,7 @@ Outputs:
   - token_limit_results.md (auto-generated)
 
 Usage:
-    python 01_prompt_playground/token_limit.py
+    python 01_prompt_playground/experiment_03_token_limit.py
 """
 
 from __future__ import annotations
@@ -227,7 +227,7 @@ def write_markdown(results: Results, out_path: Path) -> None:
     lines: list[str] = []
     a = lines.append
 
-    a("# Experiment 05 — Token Limit Analysis Results\n\n")
+    a("# Experiment 03 — Token Limit Analysis Results\n\n")
     a(f"> **Model**: `{MODEL}` | **Temperature**: `{TEMPERATURE}` | "
       f"**Budgets**: {TOKEN_BUDGETS}\n\n")
     a("---\n\n")
@@ -275,14 +275,14 @@ def write_markdown(results: Results, out_path: Path) -> None:
 # ── Entry point ────────────────────────────────────────────────────────────────
 def main() -> None:
     print(f"\n{'=' * 76}")
-    print("  Experiment 05 — Token Limit Analysis")
+    print("  Experiment 03 — Token Limit Analysis")
     print(f"  Model: {MODEL}  |  Budgets: {TOKEN_BUDGETS}  |  Domains: {list(PROMPTS)}")
     print(f"{'=' * 76}\n")
 
     results = run_experiment()
     print_report(results)
 
-    out = Path(__file__).parent / "token_limit_results.md"
+    out = Path(__file__).parent / "experiment_03_token_limit_results.md"
     write_markdown(results, out)
 
 
