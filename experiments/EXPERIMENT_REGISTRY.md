@@ -23,7 +23,7 @@ Each row links to the full experiment folder containing `experiment.md`, `code.p
 | [EXP-03](#exp-03--token-limit) | Token Limits, Truncation & Cost | [llm_behavior/token_limit/](llm_behavior/token_limit/) | `max_tokens` is a hard ceiling — responses exceeding the budget truncate mid-generation; optimal budget is domain-dependent | ✅ Complete | RAG factual answers use ~51 tokens regardless of budget (150→600). Code generation requires 800+ tokens for a class-level task. `max_tokens` is a ceiling, not a target. | How does truncation rate change across model sizes (gpt-4o-mini vs gpt-4o)? |
 | [EXP-04](#exp-04--self-attention-mechanics) | Self-Attention Mechanics (NumPy) | [llm_behavior/attention/](llm_behavior/attention/) | Self-attention produces an n×n score matrix — every token attends to every other token — making memory complexity O(n²), the root cause of context window limits | ✅ Complete | Live sweep confirmed O(n²): n=512 → 1 MB / 4 ms; n=2048 → 16 MB / 59 ms. At n=10,000 → ~381 MB per head per layer. | How does FlashAttention achieve the same output with O(n) memory I/O through tiled computation? |
 | [EXP-05](#exp-05--seed-determinism) | Seed + T=0 Determinism | [llm_behavior/seed_determinism/](llm_behavior/seed_determinism/) | `seed=42` combined with `T=0` reduces but does not eliminate output variation; `system_fingerprint` monitors backend changes | ✅ Complete | **Seed has zero effect** — Δ identity rate = +0.0% across all prompts. Determinism is task-driven (short/canonical output), not seed-driven. Use application-layer response caching. | Does seed guarantee consistent tool-call selection in agents? ([RQ-08](../research/questions/open_questions.md#rq-08)) |
-| [EXP-06](#exp-06--tokenization-domain-ratios) | Tokenization: Domain-Specific Token Ratios | [llm_behavior/tokenization/](llm_behavior/tokenization/) | Token-per-word ratio varies by ≥ 2× between common English prose and high-cost domains (non-Latin scripts, code, emoji) due to BPE vocabulary coverage | 📋 Planned | — | Does `o200k_base` reduce token count for code and non-English text versus `cl100k_base`? |
+| [EXP-06](#exp-06--tokenization-domain-ratios) | Tokenization: Domain-Specific Token Ratios | [llm_behavior/tokenization/](llm_behavior/tokenization/) | Token-per-word ratio varies by ≥ 2× between common English prose and high-cost domains (non-Latin scripts, code, emoji) due to BPE vocabulary coverage | ✅ Complete | Spread = 29.55× (English 1.25 → Japanese 37.0). JSON = 3.32× premium; Arabic = 3.81×; Python = 1.68×. Word-count abstraction breaks for space-free scripts. | Does `o200k_base` (200K vocab) reduce Arabic/code token counts vs `cl100k_base` (100K vocab)? |
 | EXP-07 | Sentence Embeddings & Cosine Similarity | `llm_behavior/embeddings/` *(planned)* | Semantically similar sentences should cluster geometrically in embedding space, measurable via cosine similarity | 📋 Planned | — | How does embedding quality degrade for domain-specific text (legal, medical) vs general language? |
 | EXP-08 | Few-Shot vs Zero-Shot Prompting | `llm_behavior/few_shot/` *(planned)* | Providing in-context examples (few-shot) improves output format adherence and factual accuracy compared to zero-shot | 📋 Planned | — | How many examples are needed before few-shot accuracy plateaus? |
 | EXP-09 | Chain-of-Thought Reasoning | `llm_behavior/chain_of_thought/` *(planned)* | Instructing the model to reason step-by-step before answering improves accuracy on multi-step reasoning tasks | 📋 Planned | — | Does chain-of-thought reasoning help on tasks where the answer is short but the path is complex? |
@@ -184,7 +184,8 @@ Does this task-driven non-determinism affect agent tool-call selection — where
 | **ID** | EXP-06 |
 | **Phase** | LLM Behavior — Tokenization |
 | **Libraries** | `tiktoken` only (no API key required) |
-| **Status** | 📋 Planned |
+| **Status** | ✅ Complete |
+| **Run date** | 2026-03-04 |
 | **Vocabulary** | `cl100k_base` (GPT-4 / GPT-4o, 100,277 tokens) |
 | **Domains tested** | 8: common English, technical English, Python code, JSON, Japanese, Arabic, medical/legal, emoji |
 
@@ -194,7 +195,7 @@ Token-per-word ratio varies by at least 2× between common English prose (1.0–
 web text — forcing rare characters and sequences to decompose into shorter subword units.
 
 **Key Insight**
-*(Populate after running code.py)*
+Spread = **29.55×** (English 1.25 → Japanese 37.0 by word count; Arabic 4.77 is the cleanest non-Latin comparison at 3.81×). JSON at 4.15 tokens/word is the most impactful finding for English-language production systems — structured context injection pays a silent 3.32× token premium. Word-count abstraction is invalid for space-free scripts (Japanese, Chinese).
 
 **Next Research Question**
 Does the `o200k_base` vocabulary (200,019 tokens, used by GPT-4o newer versions and o1) reduce

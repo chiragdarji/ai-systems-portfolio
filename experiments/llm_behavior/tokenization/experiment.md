@@ -9,7 +9,7 @@ aliases: [tokenization-experiment, exp-06, bpe-experiment]
 **ID:** EXP-06
 **Phase:** LLM Behavior
 **Category folder:** `experiments/llm_behavior/tokenization/`
-**Status:** 📋 Planned
+**Status:** ✅ Complete
 **Model:** No API calls — `tiktoken` only (`cl100k_base` vocabulary)
 **Estimated cost:** $0.00 (local computation only)
 
@@ -112,7 +112,7 @@ main()              → orchestrates all four
 > This section is populated after running `code.py`.
 > Replace placeholders with real numbers from `results.md`.
 
-**Run date:** —
+**Run date:** 2026-03-04
 **Total API calls:** 0 (tiktoken is local)
 **Estimated cost:** $0.00
 
@@ -120,18 +120,23 @@ main()              → orchestrates all four
 
 | Domain | Words | Tokens | Ratio | vs English prose |
 |--------|------:|-------:|------:|:----------------:|
-| Common English prose | — | — | — | baseline |
-| Technical English | — | — | — | — |
-| Python code | — | — | — | — |
-| JSON / structured data | — | — | — | — |
-| Japanese | — | — | — | — |
-| Arabic | — | — | — | — |
-| Medical / legal | — | — | — | — |
-| Emoji-heavy | — | — | — | — |
+| Common English prose | 131 | 164 | 1.25 | baseline |
+| Technical English | 122 | 163 | 1.34 | 1.07× |
+| Medical / legal | 104 | 177 | 1.70 | 1.36× |
+| Emoji-heavy | 93 | 164 | 1.76 | 1.41× |
+| Python code | 129 | 271 | 2.10 | 1.68× |
+| JSON / structured data | 52 | 216 | 4.15 | 3.32× |
+| Arabic | 61 | 291 | 4.77 | 3.81× |
+| Japanese | 7* | 259 | 37.00* | 29.55× |
+
+*Japanese word count from `.split()` is an artifact — Japanese uses no word spaces.
+Real metric: 259 tokens / ~230 chars ≈ 1.13 tokens/character.
 
 ### Unexpected Findings
 
-- *(document anything that surprised you — even negative results)*
+- **Japanese 37× ratio is a measurement artifact:** `.split()` returned only 7 chunks for Japanese text because Japanese doesn't use word spaces. The ratio is not comparable to other domains — but the token count (259) is real and correct for context budgeting.
+- **Emoji is cheaper than predicted:** Expected 2–6 tokens per emoji; actual ratio 1.76 because surrounding English text (1.25×) dilutes the emoji cost in the sample. Emoji-only text would show much higher ratios.
+- **JSON is the worst offender for English-language systems:** 4.15× makes it the highest-ratio domain for scripts that inject structured context — more expensive than Python code.
 
 ---
 
@@ -164,9 +169,11 @@ main()              → orchestrates all four
 > Distil the experiment into 1–3 numbered claims.
 > Each must be: specific, falsifiable, backed by a number from results.
 
-1. *(fill after run)*
-2. *(fill after run)*
-3. *(fill after run)*
+1. **JSON pays a 3.32× token premium:** A JSON payload uses 4.15 tokens/word vs 1.25 for prose — every structured context injection (tool results, retrieved docs, API schemas formatted as JSON) silently costs 3× more than the same information in plain text. *(Evidence: json_structured ratio 4.15 vs common_english 1.25)*
+
+2. **Arabic systems need a 4× cost and context buffer:** Arabic tokenises at 4.77 tokens/word with `cl100k_base` due to single-character fragmentation — a production Arabic AI system costs ~4× more per call than its English counterpart for equivalent semantic content. *(Evidence: arabic boundary preview = single-char tokens throughout; ratio 4.77)*
+
+3. **The word-count abstraction is invalid for space-free scripts:** Python's `.split()` returns 7 "words" for 259-token Japanese text. For Japanese, Chinese, and Thai, the only reliable estimation is `tiktoken.encode()` directly — word count and character count are both wrong. *(Evidence: japanese ratio 37.00 = measurement artifact, not real engineering number)*
 
 ---
 

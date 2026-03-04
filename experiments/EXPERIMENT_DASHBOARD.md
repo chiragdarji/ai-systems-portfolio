@@ -122,7 +122,7 @@ Task over-constraint (canonical short output) is the only reliable path to T=0 d
 
 ---
 
-### EXP-06 — Tokenization: Domain-Specific Token Ratios `📋 Planned`
+### EXP-06 — Tokenization: Domain-Specific Token Ratios `✅ Complete`
 
 **Investigates:** How token-per-word ratios vary across 8 input domains — common English prose,
 technical English, Python code, JSON, Japanese, Arabic, medical/legal terminology, and emoji-heavy
@@ -139,8 +139,7 @@ English prose. This experiment quantifies the correction factor for each domain.
 | Scientific Analysis | [analysis.md](llm_behavior/tokenization/analysis.md) |
 | Run | `pip install tiktoken && python experiments/llm_behavior/tokenization/code.py` |
 
-**Hypothesis:** Token-per-word ratio varies by ≥ 2× between cheapest (English prose) and most
-expensive (non-Latin script / emoji) domains due to BPE vocabulary coverage bias toward English.
+**Key finding:** Spread = **29.55×** (English 1.25 → Japanese 37.0; Arabic 4.77 = 3.81×; JSON 4.15 = 3.32×; Python code 2.10 = 1.68×). JSON is the most dangerous for production English systems — structured context injection pays a silent 3.32× token premium. Word-count abstraction collapses for space-free scripts (Japanese, Chinese).
 
 ---
 
