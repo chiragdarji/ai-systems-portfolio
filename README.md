@@ -120,23 +120,45 @@ Every script:
 
 ---
 
+## Experiment Tracking
+
+All experiments are registered and tracked in:
+
+**[`experiments/EXPERIMENT_REGISTRY.md`](experiments/EXPERIMENT_REGISTRY.md)**
+
+The registry is the single source of truth for experiment status, key insights, and cross-experiment connections.
+
+| ID | Topic | Status | Key Insight |
+|---|---|---|---|
+| [EXP-01](experiments/EXPERIMENT_REGISTRY.md#exp-01--temperature) | Temperature & Output Entropy | ✅ Complete | `T=0` is not byte-exact deterministic via OpenAI API |
+| [EXP-02](experiments/EXPERIMENT_REGISTRY.md#exp-02--system-prompt-control) | System Prompt as Behaviour Control | ✅ Complete | System prompt is a security boundary, not just a hint |
+| [EXP-03](experiments/EXPERIMENT_REGISTRY.md#exp-03--token-limit) | Token Limits, Truncation & Cost | ✅ Complete | RAG needs ~51 tokens; code generation needs 800+ |
+| [EXP-04](experiments/EXPERIMENT_REGISTRY.md#exp-04--self-attention-mechanics) | Self-Attention Mechanics (NumPy) | ✅ Complete | O(n²) memory is the root cause of context window limits |
+| EXP-05 | Embeddings & Cosine Similarity | 📋 Planned | — |
+| EXP-06 | Few-Shot vs Zero-Shot | 📋 Planned | — |
+| EXP-07 | Chain-of-Thought Reasoning | 📋 Planned | — |
+
+---
+
 ## Experiment Workflow
 
-Every experiment follows this standard structure:
+Every experiment follows this standard 4-file structure:
 
 ```
-1. experiment.md  ← Read first: hypothesis, variables, method, key questions
-2. code.py        ← Run to generate live results
-3. results.md     ← Auto-generated output — raw API responses, stats
-4. analysis.md    ← Scientific interpretation, decision frameworks, implications
+experiments/<category>/<topic>/
+├── experiment.md   ← Start here: hypothesis, variables, method, key questions
+├── code.py         ← Run to generate live results
+├── results.md      ← Auto-generated output — raw responses, stats
+└── analysis.md     ← Scientific interpretation, decision frameworks, implications
 ```
 
-When adding a new experiment:
+### Starting a new experiment
 
-1. Create a new folder under `experiments/llm_behavior/` (or a new category)
-2. Write `experiment.md` before writing code — define the hypothesis first
-3. Keep `code.py` runnable from the repo root
-4. Write `analysis.md` after reviewing results — observations should be evidence-based
+1. Copy [`experiments/experiment_template.md`](experiments/experiment_template.md) into a new folder
+2. Fill in the hypothesis and setup **before** writing any code
+3. Register it in [`EXPERIMENT_REGISTRY.md`](experiments/EXPERIMENT_REGISTRY.md) with status `📋 Planned`
+4. Run `code.py` — results auto-write to `results.md`
+5. Write `analysis.md` from evidence in results — update registry to `✅ Complete`
 
 ---
 
