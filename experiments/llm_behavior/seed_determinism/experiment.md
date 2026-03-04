@@ -109,3 +109,17 @@ in the no-seed code condition but did not affect output.
 
 - **RQ-08:** Does T=0 + seed produce consistent tool-call selection in agents — or does the same variation pattern appear in structured output (function names, arguments)?
 - **RQ-09:** If seed does not guarantee determinism, what is the correct production architecture for reproducible LLM outputs — response hashing, external cache, or deterministic post-processing?
+
+---
+
+## Links
+
+**Concepts:**
+- [`Seed Determinism`](../../../research/concepts/seed_determinism.md) — primary concept note for this experiment
+- [`LLM Behavior`](../../../research/concepts/llm_behavior.md) — parent concept: sampling, control surfaces, reproducibility
+
+**Research Questions answered:**
+- [RQ-01](../../../research/questions/open_questions.md#rq-01--temperature-seed-determinism) — Does `seed` combined with `T=0` guarantee byte-exact identical outputs? → **No. Δ=+0.0% across all prompt types.**
+
+**Research Questions raised:**
+- [RQ-08](../../../research/questions/open_questions.md#rq-08--agent-temperature-reliability) — Does T=0 + seed produce consistent tool-call selection in agents?

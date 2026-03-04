@@ -117,6 +117,7 @@ The model generates fluent text that fits the distribution — it does not "know
 | [Experiment 01 — Temperature](../../experiments/llm_behavior/temperature/experiment.md) | How `temperature` controls output entropy across 4 domains | T=0 is not byte-exact deterministic via OpenAI API |
 | [Experiment 02 — System Prompt](../../experiments/llm_behavior/system_prompt/experiment.md) | How system prompt controls tone, quality, and persona | Even a "careless" persona is faithfully followed |
 | [Experiment 03 — Token Limit](../../experiments/llm_behavior/token_limit/experiment.md) | How `max_tokens` affects completeness and cost | RAG needs ~50 tokens; code generation needs 800+ |
+| [EXP-05 — Seed + T=0 Determinism](../../experiments/llm_behavior/seed_determinism/experiment.md) | Whether `seed=42` at `T=0` produces byte-exact reproducible outputs | `seed` has zero effect at T=0 — non-determinism is FP arithmetic noise, not random sampling |
 
 ---
 

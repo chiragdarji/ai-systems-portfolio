@@ -51,3 +51,14 @@ python experiments/llm_behavior/temperature/code.py
 ## Key Finding
 
 `T=0` was **not** deterministic in live testing against `gpt-4o-mini` — all 20 determinism checks returned `DIFFERS`. Distributed GPU floating-point non-associativity causes sub-token-level variation even at zero temperature. Use `seed=<int>` alongside `T=0` for maximum reproducibility.
+
+---
+
+## Links
+
+**Concepts:**
+- [`LLM Behavior`](../../../research/concepts/llm_behavior.md) — sampling, temperature mechanics, control surfaces
+- [`Seed Determinism`](../../../research/concepts/seed_determinism.md) — T=0 non-determinism root cause and production patterns
+
+**Research Questions raised:**
+- [RQ-01](../../../research/questions/open_questions.md#rq-01--temperature-seed-determinism) — Does `seed` combined with `T=0` guarantee byte-exact identical outputs?

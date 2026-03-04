@@ -51,3 +51,14 @@ python experiments/llm_behavior/system_prompt/code.py
 ## Key Finding
 
 Even a deliberately degraded system prompt (`"You are a careless AI assistant"`) is faithfully followed by the model. This demonstrates that the system prompt is **architecture**, not configuration — a security boundary and a behaviour contract simultaneously.
+
+---
+
+## Links
+
+**Concepts:**
+- [`LLM Behavior`](../../../research/concepts/llm_behavior.md) — system prompt as a control surface; behaviour contract vs style hint
+
+**Research Questions raised:**
+- [RQ-02](../../../research/questions/open_questions.md#rq-02--prompt-injection-resistance) — How much of a system prompt can be overridden by a crafted user message?
+- [RQ-10](../../../research/questions/open_questions.md#rq-10--system-vs-user-instruction-conflict) — When system prompt and user message directly contradict, which wins?

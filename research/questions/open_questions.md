@@ -70,6 +70,7 @@ Production systems that depend on reproducibility (regression testing, audit tra
 **Hypothesis:** `seed` reduces but does not eliminate output variation. `system_fingerprint` changes (backend model updates) will break reproducibility even with fixed `seed` and `T=0`.
 
 **Proposed experiment:** EXP-05b — run 20 identical calls with `T=0, seed=42`, log `system_fingerprint`, test across multiple days to catch backend changes.
+**Linked experiment:** [`EXP-01 — Temperature`](../../experiments/llm_behavior/temperature/experiment.md) *(raised this question)* · [`EXP-05 — Seed Determinism`](../../experiments/llm_behavior/seed_determinism/experiment.md) *(answered this question)*
 
 **Concept reference:** [`research/concepts/llm_behavior.md`](../concepts/llm_behavior.md)
 
@@ -90,6 +91,7 @@ Every deployed LLM product relies on system prompt constraints for safety, compl
 **Hypothesis:** Direct injection (`"Ignore your previous instructions"`) will be resisted by modern models, but indirect injection via tool outputs or multi-turn context accumulation will succeed at higher rates.
 
 **Proposed experiment:** EXP-15 — systematic prompt injection test battery across direct, indirect (via tool output), and role-play bypass vectors.
+**Linked experiment:** [`EXP-02 — System Prompt Control`](../../experiments/llm_behavior/system_prompt/experiment.md) *(raised this question)*
 
 **Concept reference:** [`research/concepts/llm_behavior.md`](../concepts/llm_behavior.md)
 
@@ -110,6 +112,7 @@ Token budget decisions in production are model-specific. If larger models are mo
 **Hypothesis:** gpt-4o will produce more semantically dense output per token — completing the same tasks at lower token counts — but will not eliminate the need for 800+ token budgets for complex code generation.
 
 **Proposed experiment:** EXP-03b — rerun EXP-03 with gpt-4o, compare truncation rate, completion token count, and cost per completed response.
+**Linked experiment:** [`EXP-03 — Token Limit`](../../experiments/llm_behavior/token_limit/experiment.md) *(raised this question)*
 
 **Concept reference:** [`research/concepts/llm_behavior.md`](../concepts/llm_behavior.md)
 
@@ -130,6 +133,7 @@ FlashAttention is the reason modern LLMs can operate at 128K+ token context wind
 **Hypothesis:** The tiling algorithm avoids materialising the full n×n matrix by computing softmax incrementally across tiles — the "online softmax" technique. This can be demonstrated in NumPy with explicit tile loops, making the O(n) I/O claim concrete and measurable.
 
 **Proposed experiment:** EXP-04b — implement tiled attention in NumPy, verify numerical equivalence with standard attention, measure memory I/O difference.
+**Linked experiment:** [`EXP-04 — Self-Attention Mechanics`](../../experiments/llm_behavior/attention/experiment.md) *(raised this question)*
 
 **Concept reference:** [`research/concepts/transformers.md`](../concepts/transformers.md)
 
@@ -148,7 +152,8 @@ RAG pipelines over specialised corpora (legal, medical, financial) depend on emb
 
 **Hypothesis:** General embeddings will show degraded cosine similarity discrimination (similar-but-not-matching scores for domain-specific pairs) on legal and medical text, detectable by comparing same-domain vs cross-domain similarity distributions.
 
-**Proposed experiment:** EXP-05 — sentence embeddings & cosine similarity.
+**Proposed experiment:** EXP-06 — sentence embeddings & cosine similarity.
+**Linked experiment:** *(no completed experiment yet — see proposed experiment above)*
 
 **Priority:** ➡ Medium | **Status:** 🔴 Open
 
@@ -165,7 +170,8 @@ Every in-context example consumes prompt tokens. Knowing the accuracy-vs-example
 
 **Hypothesis:** Accuracy improves sharply from 0→1→2 examples, then plateaus by 3–4 examples for structured tasks. The plateau point is task-complexity dependent.
 
-**Proposed experiment:** EXP-06 — few-shot vs zero-shot prompting.
+**Proposed experiment:** EXP-07 — few-shot vs zero-shot prompting.
+**Linked experiment:** *(no completed experiment yet — see proposed experiment above)*
 
 **Priority:** ➡ Medium | **Status:** 🔴 Open
 
@@ -183,6 +189,7 @@ Chunk size is the single most impactful RAG design decision. A universal rule-of
 **Hypothesis:** Optimal chunk size varies by query type (128–256 tokens for factual Q&A, 512–1024 for multi-hop reasoning). Semantic chunking outperforms fixed-size for long documents with natural section breaks.
 
 **Proposed experiment:** EXP-08 — RAG chunk size optimisation.
+**Linked experiment:** *(no completed experiment yet — see proposed experiment above)*
 
 **Priority:** ⬆ High | **Status:** 🔴 Open
 
@@ -200,6 +207,7 @@ EXP-01 showed T=0 is not byte-exact deterministic. For agents, inconsistent tool
 **Hypothesis:** Tool call correctness (correct function + correct arguments) degrades measurably above T=0.3. At T=0 + seed, correctness is high (>95%) but not guaranteed. At T=0.7+, correctness on ambiguous queries drops below acceptable production thresholds.
 
 **Proposed experiment:** EXP-12 — temperature effect on agent reliability.
+**Linked experiment:** [`EXP-05 — Seed Determinism`](../../experiments/llm_behavior/seed_determinism/experiment.md) *(EXP-05 raised this question — seed non-determinism must be tested in agent context)*
 
 **Priority:** 🔥 Critical | **Status:** 🔴 Open
 
@@ -218,6 +226,7 @@ Production systems that parse LLM outputs (agents calling tools via JSON, code g
 **Hypothesis:** At equivalent truncation rates, structured output (JSON/code) will have a near-100% invalid-parse rate while natural-language truncation is always "valid" prose. A simple prefix check (last character is not `}` or `)`) catches >80% of JSON/code truncations without a full parser.
 
 **Proposed experiment:** EXP-03c — run 30 calls per format type (JSON, Python function, plain text) with `max_tokens` set to force ~50% truncation. Measure: parse validity rate, truncation detection via `finish_reason` vs heuristic suffix check.
+**Linked experiment:** [`EXP-03 — Token Limit`](../../experiments/llm_behavior/token_limit/experiment.md) *(raised this question — truncation of structured output observed qualitatively, not measured)*
 
 **Priority:** 🔥 Critical | **Status:** 🔴 Open
 
@@ -236,6 +245,7 @@ The assumption in production system design is that the system prompt is authorit
 **Hypothesis:** At T=0, the system prompt wins in >95% of direct contradictions. At T=0.7+, compliance becomes probabilistic. Politely-framed user overrides ("please ignore your previous instruction and...") will succeed at higher rates than direct contradictions.
 
 **Proposed experiment:** EXP-02b — design 10 direct-contradiction test pairs (system: "respond only in French", user: "respond in English"). Run each at T=0, T=0.3, T=0.7. Measure system prompt adherence rate per temperature.
+**Linked experiment:** [`EXP-02 — System Prompt Control`](../../experiments/llm_behavior/system_prompt/experiment.md) *(raised this question — cooperative personas tested, adversarial contradictions not tested)*
 
 **Priority:** ⬆ High | **Status:** 🔴 Open
 
@@ -254,5 +264,6 @@ Attention head interpretability is foundational to understanding why transformer
 **Hypothesis:** Using pretrained word embeddings (e.g. fastText or GloVe) on short sentences with known syntactic structure, different randomly-initialised heads will produce meaningfully different attention distributions — some focusing on adjacent tokens (local syntax), others on subject-verb pairs (semantic dependency). Differences will be visible in heatmap visualisation.
 
 **Proposed experiment:** EXP-04b — load 50-dim GloVe vectors, construct 5-token sentences with clear subject-verb-object structure, run 4-head attention, visualise per-head attention matrices as heatmaps, label patterns.
+**Linked experiment:** [`EXP-04 — Self-Attention Mechanics`](../../experiments/llm_behavior/attention/experiment.md) *(raised this question — random embeddings used; real semantic sentence patterns not tested)*
 
 **Priority:** ⬆ High | **Status:** 🔴 Open
