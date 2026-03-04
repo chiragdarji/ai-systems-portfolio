@@ -17,7 +17,7 @@ Outputs:
   - token_limit_results.md (auto-generated)
 
 Usage:
-    python 01_prompt_playground/experiment_03_token_limit.py
+    python experiments/llm_behavior/token_limit/code.py
 """
 
 from __future__ import annotations
@@ -282,7 +282,7 @@ def main() -> None:
     results = run_experiment()
     print_report(results)
 
-    out = Path(__file__).parent / "experiment_03_token_limit_results.md"
+    out = Path(__file__).parent / "results.md"
     write_markdown(results, out)
 
 

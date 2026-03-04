@@ -5,11 +5,11 @@ Systematically probes how OpenAI's temperature parameter affects output
 across four domains: general explanation, financial, legal, and code.
 
 Usage:
-    python 01_prompt_playground/experiment_01_temperature.py
+    python experiments/llm_behavior/temperature/code.py
 
 Outputs:
     - Formatted console report with token usage stats
-    - experiment_01_results.md  (auto-generated observations file)
+    - results.md  (auto-generated observations file)
 """
 
 from __future__ import annotations
@@ -198,7 +198,7 @@ def main() -> None:
     results = run_experiment()
     print_report(results)
 
-    out_path = Path(__file__).parent / "experiment_01_results.md"
+    out_path = Path(__file__).parent / "results.md"
     write_markdown(results, out_path)
 
 

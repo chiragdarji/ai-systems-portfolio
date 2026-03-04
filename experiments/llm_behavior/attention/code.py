@@ -12,11 +12,11 @@ Covers:
   - Practical scaling demo: tokens = 8, 64, 512, 2048
 
 Usage:
-    python 01_prompt_playground/experiment_04_attention_math.py
+    python experiments/llm_behavior/attention/code.py
 
 Outputs:
     - Formatted console walkthrough
-    - experiment_04_attention_results.md (auto-generated)
+    - results.md (auto-generated)
 """
 
 from __future__ import annotations
@@ -365,7 +365,7 @@ def main() -> None:
     # ── Report
     print_report(X, weights_single, output_single, weights_heads, output_mha, complexity)
 
-    out = Path(__file__).parent / "experiment_04_attention_results.md"
+    out = Path(__file__).parent / "results.md"
     write_markdown(X, weights_single, output_single, weights_heads, complexity, out)
 
 

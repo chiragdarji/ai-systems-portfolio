@@ -14,7 +14,7 @@ Key insight documented:
   This is how enterprise AI systems enforce tone, domain boundaries, and safety.
 
 Usage:
-    python 01_prompt_playground/experiment_02_system_prompt.py
+    python experiments/llm_behavior/system_prompt/code.py
 
 Outputs:
     - Formatted console report comparing all three personas
@@ -372,8 +372,8 @@ def main() -> None:
     print_report(results)
 
     base_dir = Path(__file__).parent
-    write_results_markdown(results, base_dir / "experiment_02_system_prompt_results.md")
-    write_analysis_markdown(results, base_dir / "experiment_02_system_prompt_analysis.md")
+    write_results_markdown(results, base_dir / "results.md")
+    write_analysis_markdown(results, base_dir / "analysis.md")
 
     print(f"\n{'=' * 80}")
     print("  Experiment complete.")
