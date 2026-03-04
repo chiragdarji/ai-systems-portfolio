@@ -24,6 +24,7 @@ Learn → Experiment → Document → Insight → Next Question
 
 | # | Command | Purpose | Output |
 |---|---------|---------|--------|
+| 0 | [`@generate_learning_path`](#0-generate_learning_path) | Find next concept to study and generate full learning task | Learning task + optional daily log append |
 | 1 | [`@start_research_day`](#1-start_research_day) | Open a daily research session | `research/daily_logs/YYYY-MM-DD_topic.md` |
 | 2 | [`@create_experiment`](#2-create_experiment) | Scaffold a new experiment folder | `experiments/<category>/<topic>/` (4 files) |
 | 3 | [`@register_experiment`](#3-register_experiment) | Add experiment to the central registry | Updated `EXPERIMENT_REGISTRY.md` |
@@ -34,6 +35,37 @@ Learn → Experiment → Document → Insight → Next Question
 | 8 | [`@link_experiment`](#8-link_experiment) | Link experiment ↔ concept ↔ research question | Updates 3 files; all links idempotent |
 | 9 | [`@create_architecture`](#9-create_architecture) | Document an AI system architecture pattern | `docs/architectures/<name>.md` |
 | 10 | [`@weekly_insight`](#10-weekly_insight) | Summarise the week's research progress | `research/insights/week_N_summary.md` |
+
+---
+
+## 0. `@generate_learning_path`
+
+**Definition file:** [`.cursor/commands/generate_learning_path.md`](.cursor/commands/generate_learning_path.md)
+
+**Purpose:** Find the next unstudied concept in `research/AI_LEARNING_SPINE.md`, then generate a complete, actionable learning task: definition, one-line rule, curated sources, a testable hypothesis, and a ready-to-run experiment scaffold.
+
+**Layer ordering is enforced** — Cursor will not suggest a Layer 2 concept while Layer 1 has gaps.
+**Sources are curated** — Anthropic Learn, HuggingFace, DeepLearning.AI, OpenAI Docs, in that priority order.
+
+**Actions:**
+1. Read ordered concept list from `research/AI_LEARNING_SPINE.md`
+2. Scan `research/concepts/` — mark each spine concept as complete or missing
+3. Identify the first missing concept in sequence order
+4. Generate a learning task: definition, one-line rule, 3 reading sources with specific pages, reading questions, hypothesis, experiment folder, `@create_experiment` scaffold command
+5. Append task to today's daily log (`research/daily_logs/YYYY-MM-DD_*.md`) if it exists — idempotent
+
+**Output:**
+```
+## Learning Task — Concept N: `<concept_name>`
+
+Definition | One-line rule | Why it matters
+Suggested Reading (3 sources with URLs + specific pages)
+Reading goal questions (3)
+Suggested Experiment (hypothesis + folder + @create_experiment command)
+After-studying checklist (@add_concept → @create_experiment → @link_experiment → @generate_learning_path)
+```
+
+**When to run:** First thing each research session. Replaces the "what do I study next?" decision entirely.
 
 ---
 
@@ -410,7 +442,12 @@ research/insights/week_N_summary.md
 ┌─────────────────────────────────────────────────────────────┐
 │  DAILY LOOP                                                 │
 │                                                             │
-│  @start_research_day                                        │
+│  @generate_learning_path  ← start here every session       │
+│       │  (reads AI_LEARNING_SPINE.md, finds next gap,       │
+│       │   generates reading list + experiment plan)         │
+│       │                                                     │
+│       ▼                                                     │
+│  @start_research_day  (creates daily log, appends task)     │
 │       │                                                     │
 │       ├──► @add_concept  (new concept encountered?)         │
 │       │         └── research/concepts/<name>.md             │
@@ -464,6 +501,7 @@ research/insights/week_N_summary.md
 
 | Command | Reads | Writes / Updates |
 |---------|-------|-----------------|
+| `@generate_learning_path` | `research/AI_LEARNING_SPINE.md`, `research/concepts/` (file scan) | Appends to `research/daily_logs/YYYY-MM-DD_*.md` (idempotent) |
 | `@start_research_day` | `AI_RESEARCH_INDEX.md` | `research/daily_logs/YYYY-MM-DD_topic.md` |
 | `@create_experiment` | `AI_RESEARCH_INDEX.md`, `experiment_template.md` | `experiments/<cat>/<topic>/` (4 files), `EXPERIMENT_REGISTRY.md`, `AI_RESEARCH_INDEX.md` |
 | `@register_experiment` | `EXPERIMENT_REGISTRY.md` | `EXPERIMENT_REGISTRY.md`, `EXPERIMENT_DASHBOARD.md`, `AI_RESEARCH_INDEX.md` |
