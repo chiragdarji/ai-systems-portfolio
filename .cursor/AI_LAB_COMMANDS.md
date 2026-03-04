@@ -31,8 +31,9 @@ Learn → Experiment → Document → Insight → Next Question
 | 5 | [`@question_to_experiment`](#5-question_to_experiment) | Promote an open RQ into a full experiment | New experiment folder + registry update |
 | 6 | [`@finalize_concept`](#6-finalize_concept) | Close a concept chapter and generate summary | `research/concepts/<concept>_summary.md` |
 | 7 | [`@add_concept`](#7-add_concept) | Add a new concept note to the knowledge base | `research/concepts/<concept>.md` |
-| 8 | [`@create_architecture`](#8-create_architecture) | Document an AI system architecture pattern | `docs/architectures/<name>.md` |
-| 9 | [`@weekly_insight`](#9-weekly_insight) | Summarise the week's research progress | `research/insights/week_N_summary.md` |
+| 8 | [`@link_experiment`](#8-link_experiment) | Link experiment ↔ concept ↔ research question | Updates 3 files; all links idempotent |
+| 9 | [`@create_architecture`](#9-create_architecture) | Document an AI system architecture pattern | `docs/architectures/<name>.md` |
+| 10 | [`@weekly_insight`](#10-weekly_insight) | Summarise the week's research progress | `research/insights/week_N_summary.md` |
 
 ---
 
@@ -284,7 +285,52 @@ research/concepts/<snake_case_name>.md
 
 ---
 
-## 8. `@create_architecture`  
+## 8. `@link_experiment`
+
+**Definition file:** [`.cursor/commands/link_experiment.md`](.cursor/commands/link_experiment.md)
+
+**Purpose:** Connect an experiment to its concept note and optionally a research question, building a navigable knowledge graph across `experiments/`, `research/concepts/`, and `research/questions/`.
+
+**All writes are idempotent — running this command twice produces identical files.**
+**All links are relative markdown paths — never absolute.**
+
+**Actions:**
+1. Ask for: experiment folder path, concept name, RQ ID (optional)
+2. Validate all three targets exist before writing anything
+3. Append a `## Links` section to `experiment.md` (concept + RQ references)
+4. Append a row to `## Related Experiments` in the concept note
+5. Add a `**Linked experiment:**` line to the RQ entry in `open_questions.md` (if RQ provided)
+6. Report every change made and every idempotency skip
+
+**Files updated (up to 3):**
+```
+experiments/<category>/<folder>/experiment.md  ← ## Links section added/extended
+research/concepts/<concept_name>.md            ← ## Related Experiments row appended
+research/questions/open_questions.md           ← Linked experiment line added to RQ-NN
+```
+
+**Idempotency checks:**
+
+| File | Check |
+|------|-------|
+| `experiment.md` | Concept filename already in `## Links`? → skip |
+| `experiment.md` | RQ-NN already in `## Links`? → skip |
+| `concept.md` | Experiment folder path already in `## Related Experiments`? → skip |
+| `open_questions.md` | `**Linked experiment:**` already in RQ-NN entry? → skip |
+
+**Relative path table:**
+
+| Writing into | Link to experiments | Link to concepts | Link to questions |
+|---|---|---|---|
+| `experiment.md` | `./` | `../../../research/concepts/` | `../../../research/questions/` |
+| `concept.md` | `../../experiments/` | `./` | `../questions/` |
+| `open_questions.md` | `../../experiments/` | `../concepts/` | `./` |
+
+**When to run:** After completing an experiment, after running `@add_concept`, or when auditing the knowledge graph to fill missing cross-links.
+
+---
+
+## 9. `@create_architecture`
 
 **Purpose:** Document a non-trivial AI system architecture pattern for future reference and portfolio demonstration.
 
@@ -323,7 +369,7 @@ docs/architectures/<name>.md
 
 ---
 
-## 9. `@weekly_insight`
+## 10. `@weekly_insight`
 
 **Purpose:** Synthesise the week's work into a permanent insight record. Prevents learnings from disappearing into daily logs that are never re-read.
 
@@ -386,6 +432,10 @@ research/insights/week_N_summary.md
 │       │                           │                         │
 │       ▼                           │                         │
 │  @generate_research_questions ────┘                         │
+│       │                                                     │
+│       ▼                                                     │
+│  @link_experiment  (formalise connections)                  │
+│    experiment.md ←→ concept.md ←→ open_questions.md         │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 
@@ -421,5 +471,6 @@ research/insights/week_N_summary.md
 | `@question_to_experiment` | `open_questions.md`, `AI_RESEARCH_INDEX.md` | `experiments/<cat>/<topic>/` (4 files), `open_questions.md`, `EXPERIMENT_REGISTRY.md`, `AI_RESEARCH_INDEX.md` |
 | `@finalize_concept` | `AI_RESEARCH_INDEX.md`, `experiments/**/analysis.md` | `research/concepts/<concept>_summary.md`, `AI_RESEARCH_INDEX.md`, `open_questions.md` |
 | `@add_concept` | `AI_RESEARCH_INDEX.md`, `research/concepts/` (duplicate check) | `research/concepts/<name>.md`, `AI_RESEARCH_INDEX.md` (Concepts Knowledge Base) |
+| `@link_experiment` | `experiment.md`, `concept.md`, `open_questions.md` (validation + idempotency) | `experiment.md` (## Links), `concept.md` (## Related Experiments), `open_questions.md` (Linked experiment line) |
 | `@create_architecture` | `architecture_template.md` | `docs/architectures/<name>.md` |
 | `@weekly_insight` | `research/daily_logs/`, `experiments/**/analysis.md` | `research/insights/week_N_summary.md` |
