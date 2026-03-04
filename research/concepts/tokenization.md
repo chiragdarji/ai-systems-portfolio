@@ -156,6 +156,7 @@ From the `cl100k_base` vocabulary:
 | [EXP-01 — Temperature & Output Entropy](../../experiments/llm_behavior/temperature/experiment.md) | `max_tokens=400` caused mid-token truncation in long outputs — tokenization explains the boundary |
 | [EXP-03 — Token Limits & Truncation](../../experiments/llm_behavior/token_limit/experiment.md) | **Primary evidence** — 51-token RAG stop, 800+ token code requirement, `finish_reason="length"` |
 | [EXP-05 — Seed Determinism](../../experiments/llm_behavior/seed_determinism/experiment.md) | `system_fingerprint` changes can indicate a new tokenizer vocabulary — token counts for identical text may shift |
+| [EXP-06 — Tokenization Domain Ratios](../../experiments/llm_behavior/tokenization/experiment.md) | **Primary measurement** — cl100k_base ratios across 8 domains: English 1.25, JSON 4.15, Arabic 4.77, Python 2.10; word-count abstraction collapses for space-free scripts |
 
 ---
 
