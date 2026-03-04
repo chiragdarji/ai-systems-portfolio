@@ -1,3 +1,9 @@
+---
+title: "Experiment 04 — Self-Attention Results"
+tags: [experiment, attention, results, complexity, multi-head]
+aliases: [attention-results, exp-04-results]
+---
+
 # Experiment 04 — Mini Attention Simulator Results
 
 > Built from scratch with NumPy only. No PyTorch, no TensorFlow.

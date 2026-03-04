@@ -1,3 +1,9 @@
+---
+title: "Experiment 04 — Self-Attention Mechanics"
+tags: [experiment, attention, transformer, llm-internals, numpy]
+aliases: [attention-experiment, exp-04]
+---
+
 # Experiment 04 — Self-Attention Mechanics
 
 **Phase:** Transformer & Representation Learning

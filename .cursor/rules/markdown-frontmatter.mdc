@@ -1,0 +1,68 @@
+---
+description: Enforce YAML frontmatter on every markdown file in this repo
+globs: **/*.md
+alwaysApply: false
+---
+
+# Markdown Frontmatter Standard
+
+Every `.md` file in this repository **must** begin with a YAML frontmatter block.
+
+## Required Format
+
+```yaml
+---
+title: "Human-readable document title"
+tags: [tag1, tag2, tag3]
+aliases: [alternative-name, short-name]
+---
+```
+
+## Rules
+
+- `title` — sentence-case, matches the first `#` heading
+- `tags` — lowercase, hyphen-separated, 2–6 tags from the taxonomy below
+- `aliases` — lowercase, hyphen-separated alternative names for Obsidian linking
+
+## Tag Taxonomy
+
+| Category | Tags |
+|---|---|
+| Type | `experiment`, `analysis`, `results`, `project`, `research`, `readme`, `roadmap` |
+| Domain | `llm-behavior`, `rag`, `agents`, `production`, `transformer`, `llm-internals` |
+| Topic | `temperature`, `system-prompt`, `token-limit`, `attention`, `embeddings`, `evaluation` |
+| Meta | `portfolio`, `insights`, `papers`, `concepts`, `learning-path` |
+
+## Examples
+
+**Experiment file:**
+```yaml
+---
+title: "Experiment 05 — Embeddings"
+tags: [experiment, embeddings, llm-internals, analysis]
+aliases: [embeddings-experiment, exp-05]
+---
+```
+
+**Project README:**
+```yaml
+---
+title: "Project — RAG Assistant"
+tags: [project, rag, retrieval, llm]
+aliases: [rag-assistant]
+---
+```
+
+**Research note:**
+```yaml
+---
+title: "Research — Scaling Laws"
+tags: [research, papers, scaling-laws, llm-internals]
+aliases: [scaling-laws, kaplan-2020]
+---
+```
+
+## Idempotency
+
+- Never add a second frontmatter block if one already exists (check `startswith("---")`)
+- When editing an existing file, update the frontmatter tags if new topics are covered

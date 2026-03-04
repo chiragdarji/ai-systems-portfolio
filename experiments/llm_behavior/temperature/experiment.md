@@ -1,3 +1,9 @@
+---
+title: "Experiment 01 — Temperature"
+tags: [experiment, temperature, llm-behavior, entropy, determinism]
+aliases: [temperature-experiment, exp-01]
+---
+
 # Experiment 01 — Temperature
 
 **Phase:** LLM Behavior & Prompt Control

@@ -1,3 +1,9 @@
+---
+title: "Experiment 03 — Token Limit"
+tags: [experiment, token-limit, max-tokens, llm-behavior, cost]
+aliases: [token-limit-experiment, exp-03]
+---
+
 # Experiment 03 — Token Limit
 
 **Phase:** LLM Behavior & Prompt Control

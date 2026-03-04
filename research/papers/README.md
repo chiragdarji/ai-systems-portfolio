@@ -1,3 +1,9 @@
+---
+title: "Research — Papers"
+tags: [research, papers, literature, attention, rag, scaling-laws]
+aliases: [papers, paper-notes, reading-list]
+---
+
 # Research — Papers
 
 Annotated notes on landmark AI research papers.

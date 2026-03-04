@@ -1,3 +1,9 @@
+---
+title: "Experiment 02 — System Prompt Analysis"
+tags: [experiment, system-prompt, llm-behavior, analysis, guardrails]
+aliases: [system-prompt-analysis, exp-02-analysis]
+---
+
 # Experiment 02 — System Prompt Control: Analysis & Learnings
 > **Model**: `gpt-4o-mini`  |  **Temperature**: `0.7` (fixed)
 ---

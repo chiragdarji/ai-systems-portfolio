@@ -1,3 +1,9 @@
+---
+title: "Research — Concepts"
+tags: [research, concepts, llm-internals, transformer, embeddings]
+aliases: [concepts, concept-notes]
+---
+
 # Research — Concepts
 
 Deep-dive notes on core AI/ML concepts studied during the learning path.

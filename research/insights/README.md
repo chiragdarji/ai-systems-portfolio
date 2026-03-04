@@ -1,3 +1,9 @@
+---
+title: "Research — Insights"
+tags: [research, insights, findings, mental-models, observations]
+aliases: [insights, key-findings]
+---
+
 # Research — Insights
 
 Original observations, mental models, and cross-domain connections developed through experiments and research.

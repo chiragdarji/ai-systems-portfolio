@@ -1,3 +1,9 @@
+---
+title: "AI Systems Portfolio"
+tags: [portfolio, readme, ai-systems, llm]
+aliases: [home, index]
+---
+
 # AI Systems Portfolio
 
 **A structured research portfolio for applied AI systems engineering.**

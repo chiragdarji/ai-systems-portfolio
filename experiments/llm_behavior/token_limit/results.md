@@ -1,3 +1,9 @@
+---
+title: "Experiment 03 — Token Limit Results"
+tags: [experiment, token-limit, results, finish-reason, truncation]
+aliases: [token-limit-results, exp-03-results]
+---
+
 # Experiment 03 — Token Limit Analysis Results
 
 > **Model**: `gpt-4o-mini` | **Temperature**: `0.3` | **Budgets**: [50, 150, 300, 600]

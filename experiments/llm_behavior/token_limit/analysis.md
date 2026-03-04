@@ -1,3 +1,9 @@
+---
+title: "Experiment 03 — Token Limit Analysis"
+tags: [experiment, token-limit, analysis, rag-chunking, chat-memory, cost]
+aliases: [token-limit-analysis, exp-03-analysis]
+---
+
 # Experiment 03 — Token Limit: A Scientific Analysis
 
 > **Core question:** How does `max_tokens` affect output completeness, quality, cost, and suitability for downstream systems like RAG and chat memory?

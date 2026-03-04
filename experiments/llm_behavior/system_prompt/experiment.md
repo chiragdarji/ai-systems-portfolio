@@ -1,3 +1,9 @@
+---
+title: "Experiment 02 — System Prompt Control"
+tags: [experiment, system-prompt, llm-behavior, persona, enterprise-ai]
+aliases: [system-prompt-experiment, exp-02]
+---
+
 # Experiment 02 — System Prompt Control
 
 **Phase:** LLM Behavior & Prompt Control

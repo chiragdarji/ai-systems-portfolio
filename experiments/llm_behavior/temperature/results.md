@@ -1,3 +1,9 @@
+---
+title: "Experiment 01 — Temperature Results"
+tags: [experiment, temperature, results, gpt-4o-mini]
+aliases: [temperature-results, exp-01-results]
+---
+
 # Experiment 01 — Temperature Analysis Results
 > **Model**: `gpt-4o-mini`  |  **Temperatures tested**: [0.0, 0.3, 0.7, 1.0, 1.5]  |  **Runs per config**: 2
 ---

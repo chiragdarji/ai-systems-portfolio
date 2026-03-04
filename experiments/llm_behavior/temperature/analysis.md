@@ -1,3 +1,9 @@
+---
+title: "Experiment 01 — Temperature Analysis"
+tags: [experiment, temperature, llm-behavior, analysis, decision-framework]
+aliases: [temperature-analysis, exp-01-analysis]
+---
+
 # Experiment 01 — LLM Temperature: A Scientific Analysis
 
 > **Hypothesis**: The `temperature` parameter controls the probability distribution over the model's next-token predictions. Higher values flatten the distribution (more randomness); lower values sharpen it (more determinism). This experiment measures the practical consequences across four real-world domains.

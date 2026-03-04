@@ -1,3 +1,9 @@
+---
+title: "Experiment 04 — Self-Attention Analysis"
+tags: [experiment, attention, transformer, llm-internals, analysis, o-n-squared, flashattention]
+aliases: [attention-analysis, exp-04-analysis]
+---
+
 # Experiment 04 — Self-Attention: A Scientific Analysis
 
 > **Core question:** What is self-attention mathematically, why does the weight matrix have shape n×n, what happens at 10,000 tokens, and why is the memory cost O(n²)?

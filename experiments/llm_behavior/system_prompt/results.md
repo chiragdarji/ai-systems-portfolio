@@ -1,3 +1,9 @@
+---
+title: "Experiment 02 — System Prompt Results"
+tags: [experiment, system-prompt, results, gpt-4o-mini]
+aliases: [system-prompt-results, exp-02-results]
+---
+
 # Experiment 02 — System Prompt Control: Raw Results
 > **Model**: `gpt-4o-mini`  |  **Temperature**: `0.7` (fixed)  |  **Personas tested**: ['BASELINE', 'CARELESS', 'RESEARCHER']
 > Temperature is held constant. The *only* variable is the system prompt.
