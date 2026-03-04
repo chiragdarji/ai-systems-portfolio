@@ -35,6 +35,7 @@ Learn → Experiment → Document → Insight → Next Question
 | 8 | [`@link_experiment`](#8-link_experiment) | Link experiment ↔ concept ↔ research question | Updates 3 files; all links idempotent |
 | 9 | [`@create_architecture`](#9-create_architecture) | Document an AI system architecture pattern | `docs/architectures/<name>.md` |
 | 10 | [`@weekly_insight`](#10-weekly_insight) | Summarise the week's research progress | `research/insights/week_N_summary.md` |
+| 11 | [`@start_project`](#11-start_project) | Scaffold a system-level AI project from completed concepts | `projects/<name>/` (3 files + 3 subfolders) |
 
 ---
 
@@ -436,6 +437,59 @@ research/insights/week_N_summary.md
 
 ---
 
+
+---
+
+## 11. `@start_project`
+
+**Definition file:** [`.cursor/commands/start_project.md`](.cursor/commands/start_project.md)
+
+**Purpose:** Scaffold a complete, portfolio-quality AI system project from completed research concepts.
+Projects are the output layer of the lab — where accumulated experiment knowledge becomes a deployable,
+demonstrable system. Every project is explicitly grounded in one or more `✅ Complete` concepts from
+`AI_RESEARCH_INDEX.md`.
+
+**Prerequisite check (runs automatically):**
+- Read `AI_RESEARCH_INDEX.md` → scan `## Concepts` for `✅ Complete` entries
+- If none found → **STOP.** Output: "No completed concepts. Run `@finalize_concept` first."
+
+**Concept → project auto-suggestion:**
+
+| Completed concepts | Suggested project |
+|--------------------|:-----------------:|
+| `tokenization` + `llm_behavior` | `token_budget_manager` |
+| `embeddings` + `vector_search` | `vector_search_engine` |
+| `rag_architecture` + `chunking_strategies` | `rag_assistant` |
+| `function_calling` + `structured_outputs` | `tool_agent` |
+| `agent_planning` + `multi_agent_systems` | `multi_agent_system` |
+
+**Actions:**
+1. Scan `AI_RESEARCH_INDEX.md` for completed concepts
+2. Match against concept → project mapping; auto-suggest or ask user to confirm
+3. Validate no duplicate `projects/<name>/` folder exists
+4. Create `projects/<project_name>/` with all required files and subfolders
+5. Populate `project.md`, `architecture.md`, `README.md` from templates
+6. Register in `AI_RESEARCH_INDEX.md` → `## Projects` table
+
+**Folder structure created:**
+```
+projects/<project_name>/
+├── project.md          ← problem, goal, concept links, system overview, status
+├── architecture.md     ← components, data flow, failure modes, scaling
+├── README.md           ← quick start, what it demonstrates, how to run
+├── implementation/     ← source code
+├── experiments/        ← project-specific experiments
+└── evaluation/         ← evaluation scripts and results
+```
+
+**`project.md` sections:** Problem · Goal (acceptance criteria) · Related Concepts · Related Experiments · System Overview · Implementation Status · Engineering Decisions
+
+**`architecture.md` sections:** System Components · Data Flow · Failure Modes · Scaling Considerations (100/10K/1M req/day) · Experiment-Grounded Decisions · When To Use / When NOT To Use
+
+**Registered in:** `AI_RESEARCH_INDEX.md` → `## Projects` table
+
+**When to run:** When at least one concept is `✅ Complete`. Typically after `@finalize_concept` closes a chapter.
+
 ## Workflow Diagram
 
 ```
@@ -495,6 +549,17 @@ research/insights/week_N_summary.md
 └─────────────────────────────────────────────────────────────┘
 ```
 
+┌─────────────────────────────────────────────────────────────┐
+│  PROJECT LOOP                                               │
+│  (when concept is ✅ Complete)                               │
+│                                                             │
+│  @start_project → reads completed concepts                  │
+│       → auto-suggests project from concept mapping          │
+│       → scaffolds projects/<name>/ (6 files + folders)      │
+│       → registers in AI_RESEARCH_INDEX.md ## Projects       │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+
 ---
 
 ## File Reference Map
@@ -512,3 +577,4 @@ research/insights/week_N_summary.md
 | `@link_experiment` | `experiment.md`, `concept.md`, `open_questions.md` (validation + idempotency) | `experiment.md` (## Links), `concept.md` (## Related Experiments), `open_questions.md` (Linked experiment line) |
 | `@create_architecture` | `architecture_template.md` | `docs/architectures/<name>.md` |
 | `@weekly_insight` | `research/daily_logs/`, `experiments/**/analysis.md` | `research/insights/week_N_summary.md` |
+| `@start_project` | `AI_RESEARCH_INDEX.md`, `research/concepts/` (status scan) | `projects/<name>/` (6 files), `AI_RESEARCH_INDEX.md` (## Projects) |

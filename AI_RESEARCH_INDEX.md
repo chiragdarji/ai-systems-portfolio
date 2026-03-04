@@ -81,6 +81,22 @@ Created via `@create_architecture` → saved to `docs/architectures/`.
 
 ---
 
+## Projects
+
+AI systems built from completed research concepts.
+Created via `@start_project` → saved to `projects/<name>/`.
+
+> **Prerequisite:** At least one concept must be `✅ Complete` before a project can be started.
+> **To add:** `@start_project` → creates `projects/<name>/` (3 files + 3 subfolders) and appends a row here.
+
+| Project | Folder | Concepts | Status | Started |
+|---------|--------|:--------:|:------:|---------|
+| *(none yet — run `@start_project` to scaffold the first)* | — | — | — | — |
+
+**Status legend:** `🚧 In Progress` · `🔄 Active Development` · `✅ Demo-Ready` · `📦 Archived`
+
+---
+
 ## Insights
 
 Weekly synthesis summaries and original observations.
