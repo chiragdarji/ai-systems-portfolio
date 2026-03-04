@@ -122,11 +122,12 @@ Every script:
 
 ## Experiment Tracking
 
-All experiments are registered and tracked in:
+All experiments are registered and tracked across two files:
 
-**[`experiments/EXPERIMENT_REGISTRY.md`](experiments/EXPERIMENT_REGISTRY.md)**
-
-The registry is the single source of truth for experiment status, key insights, and cross-experiment connections.
+| File | Purpose |
+|---|---|
+| **[`experiments/EXPERIMENT_DASHBOARD.md`](experiments/EXPERIMENT_DASHBOARD.md)** | Navigation hub — browse experiments by category with descriptions and direct file links |
+| **[`experiments/EXPERIMENT_REGISTRY.md`](experiments/EXPERIMENT_REGISTRY.md)** | Tracking log — status, key insights, next questions, cross-experiment analysis |
 
 | ID | Topic | Status | Key Insight |
 |---|---|---|---|
