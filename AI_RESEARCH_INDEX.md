@@ -91,7 +91,7 @@ Created via `@start_project` → saved to `projects/<name>/`.
 
 | Project | Folder | Concepts | Status | Started |
 |---------|--------|:--------:|:------:|---------|
-| *(none yet — run `@start_project` to scaffold the first)* | — | — | — | — |
+| [LLM Behavior Explorer](projects/llm_behavior/project.md) | `projects/llm_behavior/` | LLM Behavior · Seed Determinism · Tokenization | 🚧 In Progress | 2026-03-04 |
 
 **Status legend:** `🚧 In Progress` · `🔄 Active Development` · `✅ Demo-Ready` · `📦 Archived`
 
