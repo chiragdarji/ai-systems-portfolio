@@ -30,8 +30,9 @@ Learn → Experiment → Document → Insight → Next Question
 | 4 | [`@generate_research_questions`](#4-generate_research_questions) | Extract new RQs from completed experiments | Appended entries in `open_questions.md` |
 | 5 | [`@question_to_experiment`](#5-question_to_experiment) | Promote an open RQ into a full experiment | New experiment folder + registry update |
 | 6 | [`@finalize_concept`](#6-finalize_concept) | Close a concept chapter and generate summary | `research/concepts/<concept>_summary.md` |
-| 7 | [`@create_architecture`](#7-create_architecture) | Document an AI system architecture pattern | `docs/architectures/<name>.md` |
-| 8 | [`@weekly_insight`](#8-weekly_insight) | Summarise the week's research progress | `research/insights/week_N_summary.md` |
+| 7 | [`@add_concept`](#7-add_concept) | Add a new concept note to the knowledge base | `research/concepts/<concept>.md` |
+| 8 | [`@create_architecture`](#8-create_architecture) | Document an AI system architecture pattern | `docs/architectures/<name>.md` |
+| 9 | [`@weekly_insight`](#9-weekly_insight) | Summarise the week's research progress | `research/insights/week_N_summary.md` |
 
 ---
 
@@ -234,7 +235,56 @@ research/concepts/<concept_name>_summary.md
 
 ---
 
-## 7. `@create_architecture`
+## 7. `@add_concept`
+
+**Definition file:** [`.cursor/commands/add_concept.md`](.cursor/commands/add_concept.md)
+
+**Purpose:** Add a new concept note to the research knowledge base. Creates a structured reference file for a single AI concept, mechanism, or technique — and registers it in `AI_RESEARCH_INDEX.md`.
+
+**Distinction from `@finalize_concept`:**
+- `@add_concept` writes a *reference note* — created **before or during** experiments to capture a concept you are studying
+- `@finalize_concept` writes a *synthesis summary* — created **after** all experiments in a chapter complete
+
+**Actions:**
+1. Ask for: concept name, related experiments (optional), key insight in one sentence (optional)
+2. Convert concept name to `snake_case` for the filename
+3. Check for duplicates in `research/concepts/` and `AI_RESEARCH_INDEX.md`
+4. Create `research/concepts/<snake_case_name>.md` using the structured template
+5. Register the new concept in `AI_RESEARCH_INDEX.md` → `## Concepts Knowledge Base`
+6. Confirm creation and suggest next step (`@create_experiment` or `@generate_research_questions`)
+
+**File created:**
+```
+research/concepts/<snake_case_name>.md
+```
+
+**Sections generated:**
+```markdown
+## Definition
+## Why It Matters
+## How It Works
+## Practical Observations
+## Limitations
+## Related Experiments
+## Key Insight
+## Open Questions
+## References
+```
+
+**Naming examples:**
+
+| Input | File created |
+|-------|-------------|
+| `Seed Determinism` | `seed_determinism.md` |
+| `Online Softmax` | `online_softmax.md` |
+| `FlashAttention` | `flash_attention.md` |
+| `RAG Chunk Size` | `rag_chunk_size.md` |
+
+**When to run:** When you encounter a new concept while studying, during an experiment debrief, or when a research question introduces a term that needs a reference note.
+
+---
+
+## 8. `@create_architecture`  
 
 **Purpose:** Document a non-trivial AI system architecture pattern for future reference and portfolio demonstration.
 
@@ -272,7 +322,7 @@ docs/architectures/<name>.md
 
 ---
 
-## 8. `@weekly_insight`
+## 9. `@weekly_insight`
 
 **Purpose:** Synthesise the week's work into a permanent insight record. Prevents learnings from disappearing into daily logs that are never re-read.
 
@@ -314,8 +364,11 @@ research/insights/week_N_summary.md
 │                                                             │
 │  @start_research_day                                        │
 │       │                                                     │
+│       ├──► @add_concept  (new concept encountered?)         │
+│       │         └── research/concepts/<name>.md             │
+│       │                                                     │
 │       ▼                                                     │
-│  Check AI_RESEARCH_INDEX.md ──── concept at limit? ────► @finalize_concept
+│  Check AI_RESEARCH_INDEX.md ── concept at limit? ──► @finalize_concept
 │       │                                                     │
 │       ▼                                                     │
 │  @create_experiment  ◄──── @question_to_experiment          │
@@ -348,6 +401,8 @@ research/insights/week_N_summary.md
 │  @finalize_concept → summary generated → next concept       │
 │                      activated in AI_RESEARCH_INDEX.md      │
 │                                                             │
+│  @add_concept (anytime) → reference note added to           │
+│                           Concepts Knowledge Base           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -363,5 +418,6 @@ research/insights/week_N_summary.md
 | `@generate_research_questions` | `experiments/**/analysis.md`, `open_questions.md` | `open_questions.md`, `AI_RESEARCH_INDEX.md` |
 | `@question_to_experiment` | `open_questions.md`, `AI_RESEARCH_INDEX.md` | `experiments/<cat>/<topic>/` (4 files), `open_questions.md`, `EXPERIMENT_REGISTRY.md`, `AI_RESEARCH_INDEX.md` |
 | `@finalize_concept` | `AI_RESEARCH_INDEX.md`, `experiments/**/analysis.md` | `research/concepts/<concept>_summary.md`, `AI_RESEARCH_INDEX.md`, `open_questions.md` |
+| `@add_concept` | `AI_RESEARCH_INDEX.md`, `research/concepts/` (duplicate check) | `research/concepts/<name>.md`, `AI_RESEARCH_INDEX.md` (Concepts Knowledge Base) |
 | `@create_architecture` | `architecture_template.md` | `docs/architectures/<name>.md` |
 | `@weekly_insight` | `research/daily_logs/`, `experiments/**/analysis.md` | `research/insights/week_N_summary.md` |

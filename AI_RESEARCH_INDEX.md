@@ -247,6 +247,25 @@ Enforces the **3-experiment / 2-RQ per concept** governance rule defined in `.cu
 
 ---
 
+## Concepts Knowledge Base
+
+Standalone concept notes that support the learning path.
+Created via `@add_concept`. Each note documents a single idea, mechanism, or technique.
+These are *reference notes* written before or during experiments — not post-experiment summaries.
+
+> **To add a new concept note:** run `@add_concept`
+> **To generate a post-experiment synthesis:** run `@finalize_concept`
+
+| Concept | File | Related Experiments | Chapter | Added |
+|---------|------|:------------------:|:-------:|-------|
+| LLM Behavior | [`research/concepts/llm_behavior.md`](research/concepts/llm_behavior.md) | EXP-01, EXP-02, EXP-03, EXP-05 | 1 — LLM Behavior | 2026-03 |
+| Transformer Architecture | [`research/concepts/transformers.md`](research/concepts/transformers.md) | EXP-04 | 2 — Transformer Arch | 2026-03 |
+| Embeddings | [`research/concepts/embeddings.md`](research/concepts/embeddings.md) | *(planned EXP-06)* | 3 — Embeddings | 2026-03 |
+| RAG | [`research/concepts/rag.md`](research/concepts/rag.md) | *(planned EXP-07, EXP-08)* | 4 — RAG | 2026-03 |
+| Agents & Tool Use | [`research/concepts/agents.md`](research/concepts/agents.md) | *(planned EXP-10–12)* | 5 — Agents | 2026-03 |
+
+---
+
 ## How to Use This File
 
 ### Before creating a new experiment
