@@ -292,6 +292,7 @@ research/concepts/<snake_case_name>.md
 1. Ask for: architecture name and the problem it solves
 2. Create `docs/architectures/<name>.md` using `docs/architecture_template.md`
 3. Pre-populate with the provided problem statement
+4. Append a row to the `## Architectures` table in `AI_RESEARCH_INDEX.md`
 
 **File created:**
 ```
@@ -331,6 +332,7 @@ docs/architectures/<name>.md
 2. Read all daily logs from `research/daily_logs/` created in that date range
 3. Read all `✅ Complete` experiments' `analysis.md` files from that week
 4. Generate `research/insights/week_<N>_summary.md`
+5. Append a row to the `## Insights` table in `AI_RESEARCH_INDEX.md`
 
 **File created:**
 ```

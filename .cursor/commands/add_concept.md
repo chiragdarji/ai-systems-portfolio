@@ -167,27 +167,23 @@ Format each as: **RQ-NN** or **(proposed)** if not yet registered in open_questi
 
 ### Step 5: Register in `AI_RESEARCH_INDEX.md`
 
-Add a row under the `## Concepts Knowledge Base` section of `AI_RESEARCH_INDEX.md`.
+Append a new row to the `## Concepts` section table in `AI_RESEARCH_INDEX.md`.
+The table header is:
 
-If the section does not exist yet, create it immediately after the `## Concept Transition Log` section:
-
-```markdown
----
-
-## Concepts Knowledge Base
-
-Standalone concept notes that support the learning path but are not themselves chapters.
-Created via `@add_concept`. Each concept note documents a single idea, mechanism, or technique.
-
-| Concept | File | Related Experiments | Chapter | Added |
-|---------|------|:------------------:|---------|-------|
+```
+| Concept | File | Chapter | Experiments | Status |
 ```
 
-Then add the new row:
+Add the new row immediately before the blank line that separates the table from the
+"Concept summaries" sub-section:
 
 ```markdown
-| <Concept Name> | [`research/concepts/<file>.md`](research/concepts/<file>.md) | <EXP-NN or —> | Chapter <N> — <Chapter Name> | YYYY-MM-DD |
+| <Concept Name> | [`research/concepts/<file>.md`](research/concepts/<file>.md) | <N or —> | <EXP-NN or *(none yet)*> | 📖 Active |
 ```
+
+If the user provided related experiments, list them comma-separated in the Experiments column.
+If none provided, use `*(none yet)*`.
+For Chapter, use the chapter number from the learning path if this concept belongs to one, otherwise `—`.
 
 ### Step 6: Confirm and suggest next step
 
