@@ -23,9 +23,10 @@ Each row links to the full experiment folder containing `experiment.md`, `code.p
 | [EXP-03](#exp-03--token-limit) | Token Limits, Truncation & Cost | [llm_behavior/token_limit/](llm_behavior/token_limit/) | `max_tokens` is a hard ceiling — responses exceeding the budget truncate mid-generation; optimal budget is domain-dependent | ✅ Complete | RAG factual answers use ~51 tokens regardless of budget (150→600). Code generation requires 800+ tokens for a class-level task. `max_tokens` is a ceiling, not a target. | How does truncation rate change across model sizes (gpt-4o-mini vs gpt-4o)? |
 | [EXP-04](#exp-04--self-attention-mechanics) | Self-Attention Mechanics (NumPy) | [llm_behavior/attention/](llm_behavior/attention/) | Self-attention produces an n×n score matrix — every token attends to every other token — making memory complexity O(n²), the root cause of context window limits | ✅ Complete | Live sweep confirmed O(n²): n=512 → 1 MB / 4 ms; n=2048 → 16 MB / 59 ms. At n=10,000 → ~381 MB per head per layer. | How does FlashAttention achieve the same output with O(n) memory I/O through tiled computation? |
 | [EXP-05](#exp-05--seed-determinism) | Seed + T=0 Determinism | [llm_behavior/seed_determinism/](llm_behavior/seed_determinism/) | `seed=42` combined with `T=0` reduces but does not eliminate output variation; `system_fingerprint` monitors backend changes | ✅ Complete | **Seed has zero effect** — Δ identity rate = +0.0% across all prompts. Determinism is task-driven (short/canonical output), not seed-driven. Use application-layer response caching. | Does seed guarantee consistent tool-call selection in agents? ([RQ-08](../research/questions/open_questions.md#rq-08)) |
-| EXP-06 | Sentence Embeddings & Cosine Similarity | `llm_behavior/embeddings/` *(planned)* | Semantically similar sentences should cluster geometrically in embedding space, measurable via cosine similarity | 📋 Planned | — | How does embedding quality degrade for domain-specific text (legal, medical) vs general language? |
-| EXP-07 | Few-Shot vs Zero-Shot Prompting | `llm_behavior/few_shot/` *(planned)* | Providing in-context examples (few-shot) improves output format adherence and factual accuracy compared to zero-shot | 📋 Planned | — | How many examples are needed before few-shot accuracy plateaus? |
-| EXP-07 | Chain-of-Thought Reasoning | `llm_behavior/chain_of_thought/` *(planned)* | Instructing the model to reason step-by-step before answering improves accuracy on multi-step reasoning tasks | 📋 Planned | — | Does chain-of-thought reasoning help on tasks where the answer is short but the path is complex? |
+| [EXP-06](#exp-06--tokenization-domain-ratios) | Tokenization: Domain-Specific Token Ratios | [llm_behavior/tokenization/](llm_behavior/tokenization/) | Token-per-word ratio varies by ≥ 2× between common English prose and high-cost domains (non-Latin scripts, code, emoji) due to BPE vocabulary coverage | 📋 Planned | — | Does `o200k_base` reduce token count for code and non-English text versus `cl100k_base`? |
+| EXP-07 | Sentence Embeddings & Cosine Similarity | `llm_behavior/embeddings/` *(planned)* | Semantically similar sentences should cluster geometrically in embedding space, measurable via cosine similarity | 📋 Planned | — | How does embedding quality degrade for domain-specific text (legal, medical) vs general language? |
+| EXP-08 | Few-Shot vs Zero-Shot Prompting | `llm_behavior/few_shot/` *(planned)* | Providing in-context examples (few-shot) improves output format adherence and factual accuracy compared to zero-shot | 📋 Planned | — | How many examples are needed before few-shot accuracy plateaus? |
+| EXP-09 | Chain-of-Thought Reasoning | `llm_behavior/chain_of_thought/` *(planned)* | Instructing the model to reason step-by-step before answering improves accuracy on multi-step reasoning tasks | 📋 Planned | — | Does chain-of-thought reasoning help on tasks where the answer is short but the path is complex? |
 | EXP-08 | RAG Chunk Size Optimisation | `rag/chunk_size/` *(planned)* | Retrieval precision and recall are sensitive to chunk size — there is an optimal range per query type | 📋 Planned | — | Does semantic chunking (splitting at natural topic boundaries) outperform fixed-size chunking? |
 
 ---
@@ -173,6 +174,39 @@ Does this task-driven non-determinism affect agent tool-call selection — where
 - ▶️ [code.py](llm_behavior/seed_determinism/code.py) — Seed vs no-seed comparison runner
 - 📊 [results.md](llm_behavior/seed_determinism/results.md) — Per-call identity checks, fingerprints
 - 🔬 [analysis.md](llm_behavior/seed_determinism/analysis.md) — FP non-associativity, production caching architecture
+
+---
+
+### EXP-06 — Tokenization: Domain-Specific Token Ratios
+
+| Field | Detail |
+|---|---|
+| **ID** | EXP-06 |
+| **Phase** | LLM Behavior — Tokenization |
+| **Libraries** | `tiktoken` only (no API key required) |
+| **Status** | 📋 Planned |
+| **Vocabulary** | `cl100k_base` (GPT-4 / GPT-4o, 100,277 tokens) |
+| **Domains tested** | 8: common English, technical English, Python code, JSON, Japanese, Arabic, medical/legal, emoji |
+
+**Hypothesis**
+Token-per-word ratio varies by at least 2× between common English prose (1.0–1.3) and high-cost domains
+(non-Latin scripts, code identifiers, emoji) because BPE vocabulary coverage is biased toward English
+web text — forcing rare characters and sequences to decompose into shorter subword units.
+
+**Key Insight**
+*(Populate after running code.py)*
+
+**Next Research Question**
+Does the `o200k_base` vocabulary (200,019 tokens, used by GPT-4o newer versions and o1) reduce
+token-per-word ratios for code and non-English text versus `cl100k_base` — making newer models
+measurably cheaper on domain-specific workloads?
+
+**Files**
+- 📋 [experiment.md](llm_behavior/tokenization/experiment.md) — Hypothesis, 8 domains, variables
+- ▶️ [code.py](llm_behavior/tokenization/code.py) — tiktoken analysis, boundary visualization, auto-writes results.md
+- 📊 [results.md](llm_behavior/tokenization/results.md) — Domain ratio table, token boundary previews *(auto-generated)*
+- 🔬 [analysis.md](llm_behavior/tokenization/analysis.md) — BPE mechanism, cost model, production implications
+
 
 ---
 

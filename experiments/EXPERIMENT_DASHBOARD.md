@@ -15,7 +15,7 @@ aliases: [experiment-dashboard, experiments-hub]
 
 | Section | Experiments |
 |---|---|
-| [LLM Behavior](#-llm-behavior-experiments) | EXP-01 · EXP-02 · EXP-03 · EXP-04 · EXP-05 · EXP-06 · EXP-07 |
+| [LLM Behavior](#-llm-behavior-experiments) | EXP-01 · EXP-02 · EXP-03 · EXP-04 · EXP-05 · EXP-06 · EXP-07 · EXP-08 · EXP-09 |
 | [RAG](#-rag-experiments) | EXP-08 · EXP-09 · EXP-10 |
 | [Agents](#-agent-experiments) | EXP-11 · EXP-12 · EXP-13 |
 | [Evaluation](#-evaluation-experiments) | EXP-14 · EXP-15 |
@@ -99,22 +99,52 @@ aliases: [experiment-dashboard, experiments-hub]
 
 ---
 
-### EXP-05 — Sentence Embeddings & Cosine Similarity `📋 Planned`
+### EXP-05 — Seed + T=0 Determinism `✅ Complete`
 
-**Investigates:** How `text-embedding-3-small` represents semantic meaning as dense vectors. Measures cosine similarity between semantically close pairs (paraphrases), loosely related pairs, and unrelated pairs. Visualises the embedding space.
+**Investigates:** Whether `seed=42` combined with `T=0` guarantees byte-exact identical outputs across
+repeated API calls — and what role `system_fingerprint` plays in tracking backend changes that break
+reproducibility.
 
-**Why it matters:** Embeddings are the foundation of every RAG pipeline and vector search system. Understanding how similarity scores behave in practice is essential for tuning retrieval thresholds.
+**Why it matters:** Connects EXP-01's T=0 non-determinism finding to a production fix. Establishes
+that application-layer response caching — not API seed — is the correct reproducibility architecture
+for production LLM systems.
 
 | Document | Link |
 |---|---|
-| Hypothesis & Setup | *(not yet created)* |
-| Live Results | *(pending)* |
-| Scientific Analysis | *(pending)* |
-| Template | [experiment_template.md](experiment_template.md) |
+| Hypothesis & Setup | [experiment.md](llm_behavior/seed_determinism/experiment.md) |
+| Live Results | [results.md](llm_behavior/seed_determinism/results.md) |
+| Scientific Analysis | [analysis.md](llm_behavior/seed_determinism/analysis.md) |
+| Run | `python experiments/llm_behavior/seed_determinism/code.py` |
+
+**Key finding:** Seed had **zero measurable effect** — identity rate Δ = +0.0% across all prompt types.
+Non-determinism at T=0 is floating-point arithmetic noise, not random sampling; `seed` cannot fix it.
+Task over-constraint (canonical short output) is the only reliable path to T=0 determinism.
 
 ---
 
-### EXP-06 — Few-Shot vs Zero-Shot Prompting `📋 Planned`
+### EXP-06 — Tokenization: Domain-Specific Token Ratios `📋 Planned`
+
+**Investigates:** How token-per-word ratios vary across 8 input domains — common English prose,
+technical English, Python code, JSON, Japanese, Arabic, medical/legal terminology, and emoji-heavy
+text — using tiktoken's `cl100k_base` vocabulary (GPT-4 / GPT-4o tokenizer). No API calls required.
+
+**Why it matters:** Every production cost estimate, context window budget, and `max_tokens` decision
+operates in tokens, not words. The conventional "1,000 words ≈ 750 tokens" rule only holds for
+English prose. This experiment quantifies the correction factor for each domain.
+
+| Document | Link |
+|---|---|
+| Hypothesis & Setup | [experiment.md](llm_behavior/tokenization/experiment.md) |
+| Live Results | [results.md](llm_behavior/tokenization/results.md) *(auto-generated on run)* |
+| Scientific Analysis | [analysis.md](llm_behavior/tokenization/analysis.md) |
+| Run | `pip install tiktoken && python experiments/llm_behavior/tokenization/code.py` |
+
+**Hypothesis:** Token-per-word ratio varies by ≥ 2× between cheapest (English prose) and most
+expensive (non-Latin script / emoji) domains due to BPE vocabulary coverage bias toward English.
+
+---
+
+### EXP-07 — Few-Shot vs Zero-Shot Prompting `📋 Planned`
 
 **Investigates:** Whether providing in-context examples (few-shot) measurably improves output format adherence, factual accuracy, and task completion compared to zero-shot prompting — and how many examples are needed before accuracy plateaus.
 
@@ -292,9 +322,11 @@ aliases: [experiment-dashboard, experiments-hub]
 | EXP-02 | System Prompt as Behaviour Control | LLM Behavior | ✅ | `python experiments/llm_behavior/system_prompt/code.py` |
 | EXP-03 | Token Limits, Truncation & Cost | LLM Behavior | ✅ | `python experiments/llm_behavior/token_limit/code.py` |
 | EXP-04 | Self-Attention Mechanics | LLM Behavior | ✅ | `python experiments/llm_behavior/attention/code.py` |
-| EXP-05 | Sentence Embeddings | LLM Behavior | 📋 | *(pending)* |
-| EXP-06 | Few-Shot vs Zero-Shot | LLM Behavior | 📋 | *(pending)* |
-| EXP-07 | Chain-of-Thought Reasoning | LLM Behavior | 📋 | *(pending)* |
+| EXP-05 | Seed + T=0 Determinism | LLM Behavior | ✅ | `python experiments/llm_behavior/seed_determinism/code.py` |
+| EXP-06 | Tokenization Domain Ratios | LLM Behavior | 📋 | `pip install tiktoken && python experiments/llm_behavior/tokenization/code.py` |
+| EXP-07 | Sentence Embeddings | LLM Behavior | 📋 | *(pending)* |
+| EXP-08 | Few-Shot vs Zero-Shot | LLM Behavior | 📋 | *(pending)* |
+| EXP-09 | Chain-of-Thought Reasoning | LLM Behavior | 📋 | *(pending)* |
 | EXP-08 | RAG Chunk Size Optimisation | RAG | 📋 | *(pending)* |
 | EXP-09 | Dense vs Sparse vs Hybrid Retrieval | RAG | 📋 | *(pending)* |
 | EXP-10 | RAG Faithfulness & Hallucination Rate | RAG | 📋 | *(pending)* |

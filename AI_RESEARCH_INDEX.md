@@ -58,9 +58,10 @@ All experiments are tracked across two files:
 | [EXP-03](experiments/llm_behavior/token_limit/experiment.md) | Token Limits & Truncation | LLM Behavior | ✅ Complete | `max_tokens` is a ceiling; RAG answers self-truncate at ~51 tokens |
 | [EXP-04](experiments/llm_behavior/attention/experiment.md) | Self-Attention Mechanics | Transformer Arch | ✅ Complete | O(n²) confirmed: n=2048 → 16 MB / 59 ms |
 | [EXP-05](experiments/llm_behavior/seed_determinism/experiment.md) | Seed + T=0 Determinism | LLM Behavior | ✅ Complete | `seed` has zero effect at T=0; use response caching |
-| EXP-06 | Sentence Embeddings | Embeddings | 📋 Planned | — |
-| EXP-07 | Naive RAG Pipeline | RAG | 📋 Planned | — |
-| EXP-08 | RAG Chunk Size Optimisation | RAG | 📋 Planned | — |
+| [EXP-06](experiments/llm_behavior/tokenization/experiment.md) | Tokenization Domain Ratios | LLM Behavior | 📋 Planned | — |
+| EXP-07 | Sentence Embeddings | Embeddings | 📋 Planned | — |
+| EXP-08 | Naive RAG Pipeline | RAG | 📋 Planned | — |
+| EXP-09 | RAG Chunk Size Optimisation | RAG | 📋 Planned | — |
 
 > Full list and links → [`experiments/EXPERIMENT_DASHBOARD.md`](experiments/EXPERIMENT_DASHBOARD.md)
 
