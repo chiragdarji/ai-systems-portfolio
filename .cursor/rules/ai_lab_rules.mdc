@@ -65,6 +65,7 @@ ai-systems-portfolio/
 │   ├── architectures/       # System diagrams
 │   └── case_studies/        # Real-world AI system analyses
 │
+├── AI_RESEARCH_INDEX.md  # concept tracker — check this BEFORE adding experiments
 ├── verify_env.py
 ├── requirements.txt
 └── README.md
@@ -150,7 +151,7 @@ Every experiment — planned or complete — must have an entry in:
 📋 Planned → 🔄 In Progress → ✅ Complete
 ```
 
-Cursor must also update `experiments/EXPERIMENT_DASHBOARD.md` with the new experiment entry under the correct section.
+Cursor must also update `experiments/EXPERIMENT_DASHBOARD.md` with the new experiment entry under the correct section and check `AI_RESEARCH_INDEX.md` experiment slot count for the concept.
 
 ---
 
@@ -262,3 +263,98 @@ Cursor must never:
 - Skip YAML frontmatter on any `.md` file
 
 **If unsure where a file belongs or which experiment ID to use → ask the user before generating anything.**
+
+---
+
+## 9. Concept Governance — Preventing Infinite Loops
+
+Each concept (an entry in `AI_RESEARCH_INDEX.md`) has hard limits that Cursor must enforce
+before adding any new experiment or research question to that concept.
+
+### Hard Limits Per Concept
+
+| Resource | Limit | What happens when limit is hit |
+|----------|:-----:|-------------------------------|
+| Experiments | **3 maximum** | Concept chapter is **closed** — no new experiments until the concept is marked Complete and a summary is written |
+| Open research questions | **2 maximum** | Excess RQs must be deferred (status `⏸ Deferred`) or moved to the next concept |
+
+### Concept Lifecycle (Cursor must enforce all stages)
+
+```
+📖 ACTIVE  →  ✅ COMPLETE  →  📦 CLOSED
+  (≤3 exps)    (all exps done,   (summary written,
+  (≤2 RQs)      summary written,  next concept
+                index updated)    suggested)
+```
+
+**Stage transitions Cursor must perform automatically:**
+
+#### When the 3rd experiment completes (`✅ Complete` in registry):
+1. Check the concept's entry in `AI_RESEARCH_INDEX.md`
+2. If experiment count = 3, **flag the concept for closure**
+3. Notify: "Concept `<name>` has reached its experiment limit. Run `@close_concept` to generate the summary and open the next concept."
+
+#### When closing a concept (`@close_concept` command or manually):
+1. Generate `research/concepts/<concept_name>_summary.md` using `concept_summary_template.md`
+2. Synthesise findings from all linked `analysis.md` files into the summary
+3. Update `AI_RESEARCH_INDEX.md`: set status to `✅ Complete`, add summary link
+4. Identify the next concept from the learning path in `AI_RESEARCH_INDEX.md`
+5. Set that next concept's status to `📖 Active`
+6. Move any excess open RQs for this concept to `⏸ Deferred` in `open_questions.md`
+
+### Concept Summary File
+
+Every completed concept must produce a summary at:
+```
+research/concepts/<concept_name>_summary.md
+```
+
+The summary must be generated from `research/concepts/concept_summary_template.md` and must include:
+- Evidence-based synthesis from all linked `analysis.md` files
+- 3 key mental models (numbered, falsifiable)
+- Engineering decisions this concept unlocks
+- Connection to the next concept in the learning path
+
+### Learning Path Order
+
+Cursor must suggest the next concept in this order. Never skip ahead without the previous concept being `✅ Complete`.
+
+```
+1. LLM Behavior       → experiments/llm_behavior/
+2. Transformer Arch   → experiments/llm_behavior/ (attention experiments)
+3. Embeddings         → experiments/embeddings/
+4. RAG                → experiments/rag/
+5. Agents             → experiments/agents/
+6. Evaluation         → experiments/evaluation/
+7. Production Systems → projects/
+```
+
+### Enforcement Checklist (Cursor must run before creating any new experiment)
+
+```
+[ ] What concept does this experiment belong to?
+[ ] What is the current experiment count for that concept in AI_RESEARCH_INDEX.md?
+[ ] Is the count < 3? If not → STOP and close the concept first.
+[ ] What is the current open RQ count for that concept?
+[ ] Is the count < 2? If not → defer new RQs.
+[ ] Is this concept the currently Active concept in the learning path?
+    If not → ask the user if they intend to jump ahead.
+```
+
+### Structure Addition to Repository
+
+`AI_RESEARCH_INDEX.md` must exist at the repository root and be kept current.
+Cursor must never create a new concept's experiments without first checking this file.
+
+---
+
+## 10. Never Deviate — Extended Prohibitions
+
+In addition to §8, Cursor must never:
+
+- Add a 4th experiment to a concept already at the 3-experiment limit
+- Add a 3rd open research question to a concept already at the 2-RQ limit
+- Close a concept without generating `<concept_name>_summary.md`
+- Mark a concept `✅ Complete` in `AI_RESEARCH_INDEX.md` without a summary link
+- Suggest experiments from a future concept while the current concept is still `📖 Active`
+- Create `<concept_name>_summary.md` before all experiments for that concept are `✅ Complete`
