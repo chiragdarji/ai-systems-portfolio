@@ -39,7 +39,7 @@ Questions here drive the next experiments.
 
 | ID | Question | Topic | Related Experiment | Priority | Status |
 |----|----------|-------|--------------------|----------|--------|
-| [RQ-01](#rq-01--temperature-seed-determinism) | Does `seed` combined with `T=0` guarantee byte-exact identical outputs across different deployment regions or when `system_fingerprint` changes? | Temperature / Determinism | [EXP-01](../../experiments/llm_behavior/temperature/experiment.md) | 🔥 Critical | 🔴 Open |
+| [RQ-01](#rq-01--temperature-seed-determinism) | Does `seed` combined with `T=0` guarantee byte-exact identical outputs across different deployment regions or when `system_fingerprint` changes? | Temperature / Determinism | [EXP-05](../../experiments/llm_behavior/seed_determinism/experiment.md) | 🔥 Critical | 🟢 Answered |
 | [RQ-02](#rq-02--prompt-injection-resistance) | How much of a system prompt can be overridden by a sufficiently crafted user message? What is the real-world resistance to prompt injection? | System Prompt / Security | [EXP-02](../../experiments/llm_behavior/system_prompt/experiment.md) | 🔥 Critical | 🔴 Open |
 | [RQ-03](#rq-03--token-budget-across-model-sizes) | Does gpt-4o produce more concise answers than gpt-4o-mini for the same task, allowing smaller `max_tokens` budgets and lower cost? | Token Limit / Cost | [EXP-03](../../experiments/llm_behavior/token_limit/experiment.md) | ⬆ High | 🔴 Open |
 | [RQ-04](#rq-04--flashattention-tiled-computation) | How does FlashAttention achieve identical mathematical output to standard attention with O(n) memory I/O through tiled GPU SRAM computation? | Attention / Architecture | [EXP-04](../../experiments/llm_behavior/attention/experiment.md) | ⬆ High | 🔴 Open |
@@ -47,6 +47,9 @@ Questions here drive the next experiments.
 | [RQ-06](#rq-06--few-shot-plateau) | How many in-context examples are needed before few-shot accuracy plateaus? Is the marginal benefit of example N predictable? | Few-Shot Prompting | EXP-06 *(planned)* | ➡ Medium | 🔴 Open |
 | [RQ-07](#rq-07--rag-chunk-size-optimum) | Is there a universal optimal chunk size for RAG, or is it always query-type dependent? Does semantic chunking outperform fixed-size chunking across all domains? | RAG / Chunking | EXP-08 *(planned)* | ⬆ High | 🔴 Open |
 | [RQ-08](#rq-08--agent-temperature-reliability) | Does running agent tool-call generation at T=0 with `seed=` produce reliably consistent tool selection and argument generation across identical queries? | Agents / Reliability | EXP-12 *(planned)* | 🔥 Critical | 🔴 Open |
+| [RQ-09](#rq-09--structured-output-truncation-failure) | Does `finish_reason="length"` produce silently invalid JSON/code at a higher rate than natural-language truncation — and is the failure detectable without running a parser? | Token Limit / Structured Output | [EXP-03](../../experiments/llm_behavior/token_limit/experiment.md) | 🔥 Critical | 🔴 Open |
+| [RQ-10](#rq-10--system-vs-user-instruction-conflict) | When system prompt and user message directly contradict (language, tone, topic scope), which wins — and does the model's priority rule hold consistently across temperatures? | System Prompt / Control | [EXP-02](../../experiments/llm_behavior/system_prompt/experiment.md) | ⬆ High | 🔴 Open |
+| [RQ-11](#rq-11--attention-head-specialisation-on-real-text) | When attention weights are computed over real semantic sentences (not random embeddings), do individual heads show interpretable specialisation — syntax vs coreference vs semantics? | Attention / Interpretability | [EXP-04](../../experiments/llm_behavior/attention/experiment.md) | ⬆ High | 🔴 Open |
 
 ---
 
@@ -70,7 +73,7 @@ Production systems that depend on reproducibility (regression testing, audit tra
 
 **Concept reference:** [`research/concepts/llm_behavior.md`](../concepts/llm_behavior.md)
 
-**Priority:** 🔥 Critical | **Status:** 🔴 Open
+**Priority:** 🔥 Critical | **Status:** 🟢 Answered → [EXP-05](../../experiments/llm_behavior/seed_determinism/experiment.md) | [analysis.md](../../experiments/llm_behavior/seed_determinism/analysis.md)
 
 ---
 
@@ -199,3 +202,57 @@ EXP-01 showed T=0 is not byte-exact deterministic. For agents, inconsistent tool
 **Proposed experiment:** EXP-12 — temperature effect on agent reliability.
 
 **Priority:** 🔥 Critical | **Status:** 🔴 Open
+
+---
+
+### RQ-09 — Structured Output Truncation Failure
+
+**Question:** Does `finish_reason="length"` produce silently invalid JSON or code at a higher rate than natural-language truncation — and is the invalid output detectable without running a full parser?
+
+**Raised by:** [EXP-03 — Token Limit](../../experiments/llm_behavior/token_limit/experiment.md)
+**Finding that raised it:** Analysis noted that structured outputs (JSON, code, markdown tables) truncated at `max_tokens` produce syntactically invalid text that silently breaks downstream parsers — but this was observed qualitatively, never measured.
+
+**Why it matters:**
+Production systems that parse LLM outputs (agents calling tools via JSON, code generation pipelines, structured data extraction) have zero tolerance for silently invalid output. A natural-language truncation is ugly; a JSON truncation is a runtime crash. Knowing the failure rate guides whether to validate every response or only `length`-flagged responses.
+
+**Hypothesis:** At equivalent truncation rates, structured output (JSON/code) will have a near-100% invalid-parse rate while natural-language truncation is always "valid" prose. A simple prefix check (last character is not `}` or `)`) catches >80% of JSON/code truncations without a full parser.
+
+**Proposed experiment:** EXP-03c — run 30 calls per format type (JSON, Python function, plain text) with `max_tokens` set to force ~50% truncation. Measure: parse validity rate, truncation detection via `finish_reason` vs heuristic suffix check.
+
+**Priority:** 🔥 Critical | **Status:** 🔴 Open
+
+---
+
+### RQ-10 — System vs User Instruction Conflict
+
+**Question:** When a system prompt and user message issue directly contradictory instructions (language, output format, topic scope), which instruction wins — and is the priority rule consistent across temperature values?
+
+**Raised by:** [EXP-02 — System Prompt Control](../../experiments/llm_behavior/system_prompt/experiment.md)
+**Finding that raised it:** EXP-02 showed that personas (cooperative instructions) are faithfully followed. It never tested adversarial or contradictory conditions — only measured cooperative compliance.
+
+**Why it matters:**
+The assumption in production system design is that the system prompt is authoritative. If a user message can override it under certain conditions (high temperature, ambiguous framing, polite phrasing), that assumption is broken. This affects every deployed LLM product's reliability guarantee.
+
+**Hypothesis:** At T=0, the system prompt wins in >95% of direct contradictions. At T=0.7+, compliance becomes probabilistic. Politely-framed user overrides ("please ignore your previous instruction and...") will succeed at higher rates than direct contradictions.
+
+**Proposed experiment:** EXP-02b — design 10 direct-contradiction test pairs (system: "respond only in French", user: "respond in English"). Run each at T=0, T=0.3, T=0.7. Measure system prompt adherence rate per temperature.
+
+**Priority:** ⬆ High | **Status:** 🔴 Open
+
+---
+
+### RQ-11 — Attention Head Specialisation on Real Text
+
+**Question:** When scaled dot-product attention is applied to real semantic sentence embeddings (not random vectors), do individual attention heads in a multi-head setup produce interpretably different patterns — revealing syntactic, coreference, or semantic specialisation?
+
+**Raised by:** [EXP-04 — Self-Attention Mechanics](../../experiments/llm_behavior/attention/experiment.md)
+**Finding that raised it:** EXP-04 implemented multi-head attention on random embeddings. The weight matrices were random, so the resulting attention patterns were arbitrary. The question of whether heads in real models specialise was documented but never tested.
+
+**Why it matters:**
+Attention head interpretability is foundational to understanding why transformers work — and to building interpretability tools for debugging and auditing production models. If heads specialise on real text, that validates the "multi-head allows attending to multiple relationship types" design claim.
+
+**Hypothesis:** Using pretrained word embeddings (e.g. fastText or GloVe) on short sentences with known syntactic structure, different randomly-initialised heads will produce meaningfully different attention distributions — some focusing on adjacent tokens (local syntax), others on subject-verb pairs (semantic dependency). Differences will be visible in heatmap visualisation.
+
+**Proposed experiment:** EXP-04b — load 50-dim GloVe vectors, construct 5-token sentences with clear subject-verb-object structure, run 4-head attention, visualise per-head attention matrices as heatmaps, label patterns.
+
+**Priority:** ⬆ High | **Status:** 🔴 Open

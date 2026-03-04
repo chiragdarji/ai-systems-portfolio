@@ -22,8 +22,9 @@ Each row links to the full experiment folder containing `experiment.md`, `code.p
 | [EXP-02](#exp-02--system-prompt-control) | System Prompt as Behaviour Control | [llm_behavior/system_prompt/](llm_behavior/system_prompt/) | Changing only the system prompt — holding all else constant — produces measurably different outputs in tone, length, precision, and quality | ✅ Complete | The model faithfully follows even degraded instructions (`"You are a careless AI"`). System prompt is a **security boundary**, not just a hint. | How much of a system prompt can be overridden by a sufficiently crafted user message (prompt injection)? |
 | [EXP-03](#exp-03--token-limit) | Token Limits, Truncation & Cost | [llm_behavior/token_limit/](llm_behavior/token_limit/) | `max_tokens` is a hard ceiling — responses exceeding the budget truncate mid-generation; optimal budget is domain-dependent | ✅ Complete | RAG factual answers use ~51 tokens regardless of budget (150→600). Code generation requires 800+ tokens for a class-level task. `max_tokens` is a ceiling, not a target. | How does truncation rate change across model sizes (gpt-4o-mini vs gpt-4o)? |
 | [EXP-04](#exp-04--self-attention-mechanics) | Self-Attention Mechanics (NumPy) | [llm_behavior/attention/](llm_behavior/attention/) | Self-attention produces an n×n score matrix — every token attends to every other token — making memory complexity O(n²), the root cause of context window limits | ✅ Complete | Live sweep confirmed O(n²): n=512 → 1 MB / 4 ms; n=2048 → 16 MB / 59 ms. At n=10,000 → ~381 MB per head per layer. | How does FlashAttention achieve the same output with O(n) memory I/O through tiled computation? |
-| EXP-05 | Sentence Embeddings & Cosine Similarity | `llm_behavior/embeddings/` *(planned)* | Semantically similar sentences should cluster geometrically in embedding space, measurable via cosine similarity | 📋 Planned | — | How does embedding quality degrade for domain-specific text (legal, medical) vs general language? |
-| EXP-06 | Few-Shot vs Zero-Shot Prompting | `llm_behavior/few_shot/` *(planned)* | Providing in-context examples (few-shot) improves output format adherence and factual accuracy compared to zero-shot | 📋 Planned | — | How many examples are needed before few-shot accuracy plateaus? |
+| [EXP-05](#exp-05--seed-determinism) | Seed + T=0 Determinism | [llm_behavior/seed_determinism/](llm_behavior/seed_determinism/) | `seed=42` combined with `T=0` reduces but does not eliminate output variation; `system_fingerprint` monitors backend changes | ✅ Complete | **Seed has zero effect** — Δ identity rate = +0.0% across all prompts. Determinism is task-driven (short/canonical output), not seed-driven. Use application-layer response caching. | Does seed guarantee consistent tool-call selection in agents? ([RQ-08](../research/questions/open_questions.md#rq-08)) |
+| EXP-06 | Sentence Embeddings & Cosine Similarity | `llm_behavior/embeddings/` *(planned)* | Semantically similar sentences should cluster geometrically in embedding space, measurable via cosine similarity | 📋 Planned | — | How does embedding quality degrade for domain-specific text (legal, medical) vs general language? |
+| EXP-07 | Few-Shot vs Zero-Shot Prompting | `llm_behavior/few_shot/` *(planned)* | Providing in-context examples (few-shot) improves output format adherence and factual accuracy compared to zero-shot | 📋 Planned | — | How many examples are needed before few-shot accuracy plateaus? |
 | EXP-07 | Chain-of-Thought Reasoning | `llm_behavior/chain_of_thought/` *(planned)* | Instructing the model to reason step-by-step before answering improves accuracy on multi-step reasoning tasks | 📋 Planned | — | Does chain-of-thought reasoning help on tasks where the answer is short but the path is complex? |
 | EXP-08 | RAG Chunk Size Optimisation | `rag/chunk_size/` *(planned)* | Retrieval precision and recall are sensitive to chunk size — there is an optimal range per query type | 📋 Planned | — | Does semantic chunking (splitting at natural topic boundaries) outperform fixed-size chunking? |
 
@@ -147,6 +148,34 @@ How does FlashAttention achieve the same mathematical output with O(n) memory I/
 
 ---
 
+### EXP-05 — Seed Determinism
+
+| Field | Detail |
+|---|---|
+| **ID** | EXP-05 |
+| **Phase** | LLM Behavior — Reproducibility |
+| **Libraries** | openai, python-dotenv |
+| **Status** | ✅ Complete |
+| **Run date** | 2026-03-04 |
+| **Conditions** | 2 (T=0+seed vs T=0 no-seed) × 3 prompts × 10 calls = 60 API calls |
+
+**Hypothesis**
+`seed=42` combined with `T=0` reduces but does not eliminate output variation. `system_fingerprint` changes break reproducibility even with fixed seed.
+
+**Key Insight**
+Seed had **zero measurable effect** — identity rate delta was +0.0% across all prompt types. Non-determinism at T=0 is floating-point arithmetic noise, not random sampling, which seed cannot fix. Code outputs were 100% identical in *both* conditions — driven by task over-constraint, not seed. A `system_fingerprint` change was observed mid-experiment but did not affect the canonical code output.
+
+**Next Research Question**
+Does this task-driven non-determinism affect agent tool-call selection — where inconsistency is a correctness failure, not a style issue? ([RQ-08](../research/questions/open_questions.md#rq-08))
+
+**Files**
+- 📋 [experiment.md](llm_behavior/seed_determinism/experiment.md) — Hypothesis, RQ-01 link, variables
+- ▶️ [code.py](llm_behavior/seed_determinism/code.py) — Seed vs no-seed comparison runner
+- 📊 [results.md](llm_behavior/seed_determinism/results.md) — Per-call identity checks, fingerprints
+- 🔬 [analysis.md](llm_behavior/seed_determinism/analysis.md) — FP non-associativity, production caching architecture
+
+---
+
 ## Cross-Experiment Insights
 
 | Insight | Experiments |
@@ -156,6 +185,9 @@ How does FlashAttention achieve the same mathematical output with O(n) memory I/
 | Domain determines the optimal token budget — there is no single right value of `max_tokens` | EXP-03 |
 | RAG's effectiveness comes partly from keeping n small — reducing quadratic attention cost | EXP-03, EXP-04 |
 | O(n²) attention memory is the architectural reason for all LLM context window limits | EXP-04 |
+| `seed` has zero effect at T=0 — non-determinism is FP arithmetic noise, not random sampling | EXP-01, EXP-05 |
+| Task over-constraint (canonical answer + short output) is the only reliable path to T=0 determinism | EXP-05 |
+| The correct production reproducibility architecture is application-layer response caching, not API seed | EXP-05 |
 
 ---
 

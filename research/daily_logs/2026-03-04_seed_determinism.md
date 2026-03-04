@@ -1,0 +1,80 @@
+---
+title: "Research Log — 2026-03-04 — Seed Determinism"
+tags: [daily-log, research, temperature, determinism, llm-behavior, 2026-03]
+aliases: [log-2026-03-04, seed-determinism-log]
+---
+
+# Research Log — 2026-03-04
+
+**Topic:** Seed + T=0 Determinism
+**Session goal:** Convert RQ-01 into a live experiment — quantify whether `seed=42` combined with `T=0` produces byte-exact reproducible outputs across repeated calls.
+**Related experiment:** [EXP-05 — Seed Determinism](../../experiments/llm_behavior/seed_determinism/experiment.md)
+**Concept reference:** [research/concepts/llm_behavior.md](../concepts/llm_behavior.md)
+
+---
+
+## Objective
+
+EXP-01 showed that `T=0` alone is not deterministic — all 20 determinism checks returned `DIFFERS`. The question RQ-01 asks: does adding `seed=42` close that gap?
+
+**Today I want to:**
+1. Run 30 calls at `T=0 + seed=42` across 3 prompts and measure token-level identity
+2. Run 10 calls at `T=0` without seed as a control baseline
+3. Log `system_fingerprint` on every call to detect backend model changes
+4. Document whether seed provides statistical or exact determinism
+
+**Session is successful if:**
+- Clear quantitative answer to RQ-01 (% identical outputs with vs without seed)
+- `system_fingerprint` behaviour documented
+- Results written to `results.md` and analysis in `analysis.md`
+
+---
+
+## Resources Studied
+
+| Resource | Type | Key takeaway |
+|---|---|---|
+| [OpenAI Reproducibility Docs](https://platform.openai.com/docs/api-reference/chat/create#chat-create-seed) | Docs | "High probability" not "guaranteed" — backend model changes break seed |
+| EXP-01 analysis.md | Prior experiment | T=0 produced DIFFERS on all 20 checks — seed untested |
+| RQ-01 detail entry | Research question | Proposed: 20+ calls, log system_fingerprint, test over days |
+
+---
+
+## Experiments Planned
+
+| Action | Experiment | Status |
+|---|---|---|
+| Run | [EXP-05 — Seed Determinism](../../experiments/llm_behavior/seed_determinism/experiment.md) | 🔄 In Progress |
+
+---
+
+## Insights
+
+1. **`seed` has zero effect at `T=0`** — this is the most important finding. Δ identity rate = +0.0% across all prompt types. The non-determinism at T=0 is floating-point arithmetic noise (not random sampling), which no API parameter can fix.
+
+2. **Determinism is task-driven, not parameter-driven** — code outputs were 100% identical in both conditions. The Fibonacci+memoisation task is maximally over-constrained (canonical answer, short output), which drives convergence regardless of seed.
+
+3. **`system_fingerprint` changed during the experiment** — call 6 of `code/no_seed` received a different backend model version (`fp_583fd98828` vs `fp_373a14eb6f`). The output was still identical because the task is over-constrained. This validates the importance of monitoring fingerprint in production.
+
+4. **Production architecture lesson** — the correct reproducibility strategy is application-layer response caching (hash input → store output), not API-level seed. This is more reliable, cheaper (no repeat API calls), and model-version-independent.
+
+---
+
+## Open Questions
+
+- **RQ-08:** Does this non-determinism pattern extend to agent tool-call selection? (A `transfer_funds` vs `get_balance` inconsistency is not a style issue — it's a correctness failure.)
+- **RQ-09:** Does task over-constraint (which drove code determinism) also protect against truncation-induced invalid structured outputs?
+- **New:** At what output length does T=0 transition from deterministic to non-deterministic? Is there a token threshold?
+
+---
+
+## Session Wrap-up
+
+**Status:** ✅ Complete
+
+**RQ-01 answered:** Seed does not guarantee determinism. Closed and moved to `answered_questions.md`.
+**EXP-05 completed:** All 4 files written. Registered in EXPERIMENT_REGISTRY.md.
+**3 new research questions generated:** RQ-09, RQ-10, RQ-11 added to open_questions.md.
+**Next session:** Consider RQ-08 (agent tool-call reliability) or RQ-04 (FlashAttention NumPy simulation).
+
+**Commits:** All changes committed and pushed to `main`.

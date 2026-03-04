@@ -21,6 +21,7 @@ Research questions that have been resolved through experiments in this repositor
 | [AQ-02](#aq-02--does-system-prompt-alone-determine-behaviour) | Does changing only the system prompt — holding all other variables constant — produce measurably different outputs in tone, length, and quality? | [EXP-02](../../experiments/llm_behavior/system_prompt/experiment.md) | Yes — the RESEARCHER persona produced significantly longer, denser responses than BASELINE; CARELESS produced shorter, lower-precision outputs. System prompt is the primary behaviour lever. | Mar 2026 |
 | [AQ-03](#aq-03--is-max_tokens-a-ceiling-or-a-target) | Is `max_tokens` a ceiling that the model always fills, or a target it stops at naturally when done? | [EXP-03](../../experiments/llm_behavior/token_limit/experiment.md) | Ceiling. RAG answers completed at 51 tokens with budgets of 150, 300, or 600 — the model stopped itself. Code generation hit the ceiling at all tested budgets. | Mar 2026 |
 | [AQ-04](#aq-04--is-the-attention-weight-matrix-always-n×n) | Is the attention weight matrix necessarily n×n in shape — and does this structure make memory complexity O(n²)? | [EXP-04](../../experiments/llm_behavior/attention/experiment.md) | Yes on both. `Q @ K.T = [n, d_k] × [d_k, n] = [n, n]` is unavoidable with full attention. Live sweep confirmed O(n²): 4× memory per 2× tokens, ~15× compute. | Mar 2026 |
+| [AQ-05](#aq-05--does-seed-combined-with-t0-guarantee-determinism) | Does adding `seed=42` to `T=0` API calls produce byte-exact identical outputs — or does non-determinism persist? | [EXP-05](../../experiments/llm_behavior/seed_determinism/experiment.md) | **No.** Seed had zero effect — identity rate delta was +0.0% across all prompt types. Determinism is task-driven (short/canonical output). Use response caching for reproducibility. | Mar 2026 |
 
 ---
 
@@ -141,3 +142,41 @@ Doubling n → 4× memory, ~5× compute — consistent with O(n²) prediction.
 **Downstream question opened:** [RQ-04 — FlashAttention Tiled Computation](open_questions.md#rq-04--flashattention-tiled-computation)
 
 **Updated concept note:** [`research/concepts/transformers.md`](../concepts/transformers.md)
+
+---
+
+### AQ-05 — Does seed combined with T=0 guarantee determinism?
+
+**Original question:** [RQ-01 — Temperature Seed Determinism](open_questions.md#rq-01--temperature-seed-determinism)
+**Answering experiment:** [EXP-05 — Seed + T=0 Determinism](../../experiments/llm_behavior/seed_determinism/experiment.md)
+**Run date:** 2026-03-04
+
+**Answer:** **No — seed had zero measurable effect.**
+
+Identity rate delta between `T=0+seed=42` and `T=0 (no seed)` was exactly **+0.0%** across all three prompt types (analytical, creative, code).
+
+**Evidence:**
+| Condition | Analytical | Creative | Code |
+|-----------|:----------:|:--------:|:----:|
+| T=0 + seed=42 | 0.0% identity | 0.0% identity | 100% identity |
+| T=0 (no seed) | 0.0% identity | 0.0% identity | 100% identity |
+| **Δ** | **+0.0%** | **+0.0%** | **+0.0%** |
+
+**Why seed has no effect at T=0:**
+`seed` seeds the random number generator used for sampling from the token probability distribution. At `T=0`, the distribution has already collapsed to a delta function (argmax). There is no random sampling — therefore nothing to seed. The residual non-determinism comes from **floating-point non-associativity** in distributed GPU computation, which no API parameter can fix.
+
+**The code result — 100% identity in both conditions — is NOT evidence that seed works:**
+Code was deterministic because the task ("Fibonacci with memoisation") is maximally over-constrained. The model has seen this canonical pattern millions of times and produces one output. This is *task-driven determinism*, not seed-driven.
+
+**Unexpected finding:** A `system_fingerprint` change was observed mid-experiment during the `code / no_seed` condition (call 6 received `fp_583fd98828` instead of `fp_373a14eb6f`) — yet the output was still identical. This shows that fingerprint changes don't *always* break output stability for highly constrained tasks.
+
+**Practical impact:**
+- Do not rely on T=0+seed for reproducible testing, audit trails, or regression suites
+- Correct architecture: **application-layer response caching** (hash system+user+params → store output)
+- Always log `system_fingerprint` — a change is a model version bump and signals cache invalidation
+
+**Downstream questions opened:**
+- [RQ-08 — Agent Tool-Call Reliability](open_questions.md#rq-08--agent-temperature-reliability) — does this non-determinism break agent function selection?
+- [RQ-09 — Structured Output Truncation](open_questions.md#rq-09--structured-output-truncation-failure) — task over-constraint also affects truncation behaviour
+
+**Updated concept note:** [`research/concepts/llm_behavior.md`](../concepts/llm_behavior.md)
