@@ -1,3 +1,9 @@
+---
+title: "Command — Generate Research Questions"
+tags: [command, research, questions, experiments, automation]
+aliases: [generate-research-questions, research-questions-command]
+---
+
 # Command: Generate Research Questions
 
 Scan completed experiments, extract unresolved insights, and append new research questions to the open questions backlog.
